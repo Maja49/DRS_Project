@@ -4,9 +4,6 @@ from utils.token_utils import decode_token  # Import funkcije za validaciju toke
 
 theme_bp = Blueprint('theme', __name__)
 
-@theme_bp.route('/resi', methods=['GET'])
-def create_theme():
-    return jsonify({'message': 'Theme route working!'}), 200
 
 @theme_bp.route('/createee', methods=['POST'])
 def create_theme():
