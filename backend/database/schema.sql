@@ -18,3 +18,10 @@ VALUES
 ('Maja', 'Pavić', 'Neka Adresa 1', 'Novi Sad', 'Serbia', '1234567890', 'maja2@example.com', 'primer', 'primer', FALSE);
 
 ALTER TABLE User ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
+
+
+CREATE TABLE Theme(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255)
+)
