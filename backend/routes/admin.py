@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models.user import db, User
 from flask_socketio import SocketIO, emit
-from utilis.token_utilis import decode_token #i admin dobija token kad se prijavi
+from utils.token_utils import decode_token #i admin dobija token kad se prijavi
 
 admin_bp = Blueprint('admin', __name__)
 socketio = SocketIO() #ovo ce sluziti da se automatski azuriraju zahtjevi
