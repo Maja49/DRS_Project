@@ -23,3 +23,10 @@ ALTER TABLE Theme DROP COLUMN id2;
 
 
 SELECT * FROM Theme;
+
+CREATE TABLE Comment(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    idUser INT NOT NULL,
+    content VARCHAR(500),
+    idOfMentionUser INT NOT NULL
+);
