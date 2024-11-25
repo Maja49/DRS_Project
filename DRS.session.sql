@@ -9,4 +9,9 @@ CREATE TABLE Theme(
     description VARCHAR(255)
 )
 
+ALTER TABLE Theme DROP COLUMN id2;
+
+
+SELECT * FROM Theme;
+
 select * from Theme;
