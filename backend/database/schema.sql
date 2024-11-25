@@ -30,3 +30,15 @@ CREATE TABLE Comment(
     content VARCHAR(500),
     idOfMentionUser INT NOT NULL
 );
+
+CREATE TABLE Discussion(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(500),
+    theme VARCHAR(255),
+    likes INT NOT NULL,
+    dislike INT NOT NULL,
+    comment VARCHAR(500),
+    idUser INT NOT NULL
+);
+
+SELECT * FROM discussion
