@@ -1,3 +1,4 @@
+#ovdje se nalaze rute i logika za registraciju, prijavu i uredjivanje profila
 from flask import Blueprint, request, jsonify
 from models.user import User, db
 from utils.token_utils import generate_token, decode_token
