@@ -2,7 +2,6 @@ from flask import Flask
 from routes.auth import auth_bp #za dobijanje API-ja
 from routes.admin import admin_bp  # Import administrativnih ruta
 from routes.theme import theme_bp 
-from models import db
 from models.user import db #db je instanca SQLAlchemy
 import config #preuzimanje iz config.txt npr. naziv baze, lozinka, korisnicko ime
 
@@ -35,4 +34,3 @@ if __name__ == '__main__':
         db.create_all()  # kreira tabele u bazi ako ne postoje
                          #provjerava sve modele iz aplikacije i na osnovu nih kreira odgovarajuce tabele u bazi, ako ne postoji
     app.run(debug=True)  #pokretanje aplikacije
-
