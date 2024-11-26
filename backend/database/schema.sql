@@ -44,3 +44,7 @@ CREATE TABLE Discussion(
 SELECT * FROM discussion
 
 select * from user
+
+DROP TABLE theme;
+DROP TABLE comment;
+DROP TABLE discussion;
