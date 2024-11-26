@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Comment(db.Model):
-    _tablename_ = 'comment'
+    __tablename__ = 'comment'
     #id komentara
     id = db.Column(db.Integer, primary_key=True)
     #id usera

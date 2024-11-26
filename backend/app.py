@@ -23,12 +23,13 @@ db.init_app(app)
 #ovaj blueprint ce se koristiti za login i registraciju, prefiks ce im biti /api/auth
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
-
-
 # ruta za admina koji upravlja registracijama
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
+
 app.register_blueprint(theme_bp, url_prefix='/api/theme')
+
+
 
 if __name__ == '__main__':
     with app.app_context():
