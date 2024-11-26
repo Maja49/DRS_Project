@@ -2,6 +2,7 @@ from flask import Flask
 from routes.auth import auth_bp #za dobijanje API-ja
 from routes.admin import admin_bp  # Import administrativnih ruta
 from routes.theme import theme_bp 
+from models import db
 from models.user import db #db je instanca SQLAlchemy
 import config #preuzimanje iz config.txt npr. naziv baze, lozinka, korisnicko ime
 

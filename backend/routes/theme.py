@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models.theme import Theme, db
+from models import db
 from utils.token_utils import decode_token
 
 theme_bp = Blueprint('theme', __name__)
