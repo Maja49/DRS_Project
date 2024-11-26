@@ -14,4 +14,4 @@ ALTER TABLE Theme DROP COLUMN id2;
 
 SELECT * FROM Theme;
 
-select * from Theme;
+select * from User;

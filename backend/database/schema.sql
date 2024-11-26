@@ -42,3 +42,5 @@ CREATE TABLE Discussion(
 );
 
 SELECT * FROM discussion
+
+select * from user
