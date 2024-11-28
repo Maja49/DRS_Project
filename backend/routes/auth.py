@@ -1,6 +1,7 @@
 #ovdje se nalaze rute i logika za registraciju, prijavu i uredjivanje profila
 from flask import Blueprint, request, jsonify
-from models.user import User, db
+from models import db
+from models.user import User
 from utils.token_utils import generate_token, decode_token
 
 auth_bp = Blueprint('auth', __name__)
