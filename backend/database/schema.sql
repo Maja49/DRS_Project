@@ -93,3 +93,28 @@ CREATE TABLE commentdiscussion (
 );
 
 ALTER TABLE discussion RENAME COLUMN topic TO theme;
+
+drop table commentdiscussion;
+drop table discussion;
+
+CREATE TABLE discussion (
+    id INT AUTO_INCREMENT PRIMARY KEY,          -- Jedinstveni ID diskusije
+    text TEXT NOT NULL,                         -- Tekst diskusije
+    theme_id INT NOT NULL,                      -- ID teme povezano sa tabelom theme
+    likes INT DEFAULT 0,                        -- Broj lajkova
+    dislikes INT DEFAULT 0,                     -- Broj dislajkova
+    user_id INT NOT NULL,                       -- ID korisnika koji je kreirao diskusiju
+    FOREIGN KEY (theme_id) REFERENCES theme(id) -- Strani ključ ka tabeli theme
+);
+
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,         -- ID komentara
+    discussion_id INT NOT NULL,      -- ID diskusije
+
+    -- Primarni ključ je kombinacija oba ID-a
+    PRIMARY KEY (comment_id, discussion_id),
+
+    -- Strani ključevi
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);

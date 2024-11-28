@@ -3,6 +3,7 @@ from routes import auth_bp, admin_bp, theme_bp, discussion_bp
 from models import db
 from flask_socketio import SocketIO
 import config
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
 
@@ -30,7 +31,13 @@ app.register_blueprint(theme_bp, url_prefix='/api/theme')
 
 app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
 
+# Secret key for signing JWTs
+app.config['SECRET_KEY'] = 'your-secret-key'
+# JWT token location (commonly in headers or cookies)
+app.config['JWT_TOKEN_LOCATION'] = ['headers']  # You can also use 'cookies' or both
 
+# Initialize JWT manager
+jwt = JWTManager(app)
 
 if __name__ == '__main__':
     with app.app_context():
