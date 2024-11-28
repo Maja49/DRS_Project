@@ -74,7 +74,7 @@ CREATE TABLE comment (
 CREATE TABLE discussion (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- Jedinstveni ID diskusije
     text TEXT NOT NULL,                 -- Tekst diskusije
-    topic VARCHAR(100) NOT NULL,        -- Tema diskusije
+    theme VARCHAR(100) NOT NULL,        -- Tema diskusije
     likes INT DEFAULT 0,                -- Broj lajkova
     dislikes INT DEFAULT 0,             -- Broj dislajkova
     user_id INT NOT NULL                -- ID korisnika koji je kreirao diskusiju
@@ -91,3 +91,5 @@ CREATE TABLE commentdiscussion (
     FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
     FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
 );
+
+ALTER TABLE discussion RENAME COLUMN topic TO theme;

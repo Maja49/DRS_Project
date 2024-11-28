@@ -1,6 +1,7 @@
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp
 from models import db
+from flask_socketio import SocketIO
 import config
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
@@ -26,6 +27,10 @@ app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
 #ruta za temu
 app.register_blueprint(theme_bp, url_prefix='/api/theme')
+
+app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
+
+
 
 if __name__ == '__main__':
     with app.app_context():

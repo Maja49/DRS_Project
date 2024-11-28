@@ -6,7 +6,7 @@ class Discussion(db.Model):
     # Kolone tabele
     id = db.Column(db.Integer, primary_key=True)  # Jedinstveni ID diskusije
     text = db.Column(db.Text, nullable=False)  # Tekst diskusije
-    topic = db.Column(db.String(100), nullable=False)  # Tema diskusije
+    teme = db.Column(db.String(100), nullable=False)  # Tema diskusije
     likes = db.Column(db.Integer, default=0)  # Broj lajkova
     dislikes = db.Column(db.Integer, default=0)  # Broj dislajkova
 
