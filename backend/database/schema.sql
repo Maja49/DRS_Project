@@ -57,3 +57,64 @@ select * from user
 DROP TABLE theme;
 DROP TABLE comment;
 DROP TABLE discussion;
+
+CREATE TABLE comment (
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- Auto-incrementing ID
+    user_id INT NOT NULL,  -- ID korisnika koji je napisao komentar
+    post_id INT NOT NULL,  -- ID objave kojoj komentar pripada
+    text TEXT NOT NULL,  -- Tekst komentara
+    mentioned_user_id INT,  -- ID korisnika koji je označen (opcionalno)
+
+    -- Strani ključevi
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,  -- povezivanje sa tabelom 'users'
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,  -- povezivanje sa tabelom 'posts'
+    FOREIGN KEY (mentioned_user_id) REFERENCES users(id) ON DELETE SET NULL  -- povezivanje sa tabelom 'users', opcionalno
+); 
+
+CREATE TABLE discussion (
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- Jedinstveni ID diskusije
+    text TEXT NOT NULL,                 -- Tekst diskusije
+    theme VARCHAR(100) NOT NULL,        -- Tema diskusije
+    likes INT DEFAULT 0,                -- Broj lajkova
+    dislikes INT DEFAULT 0,             -- Broj dislajkova
+    user_id INT NOT NULL                -- ID korisnika koji je kreirao diskusiju
+);
+
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,         -- ID komentara
+    discussion_id INT NOT NULL,      -- ID diskusije
+
+    -- Primarni ključ je kombinacija oba ID-a
+    PRIMARY KEY (comment_id, discussion_id),
+
+    -- Strani ključevi
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);
+
+ALTER TABLE discussion RENAME COLUMN topic TO theme;
+
+drop table commentdiscussion;
+drop table discussion;
+
+CREATE TABLE discussion (
+    id INT AUTO_INCREMENT PRIMARY KEY,          -- Jedinstveni ID diskusije
+    text TEXT NOT NULL,                         -- Tekst diskusije
+    theme_id INT NOT NULL,                      -- ID teme povezano sa tabelom theme
+    likes INT DEFAULT 0,                        -- Broj lajkova
+    dislikes INT DEFAULT 0,                     -- Broj dislajkova
+    user_id INT NOT NULL,                       -- ID korisnika koji je kreirao diskusiju
+    FOREIGN KEY (theme_id) REFERENCES theme(id) -- Strani ključ ka tabeli theme
+);
+
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,         -- ID komentara
+    discussion_id INT NOT NULL,      -- ID diskusije
+
+    -- Primarni ključ je kombinacija oba ID-a
+    PRIMARY KEY (comment_id, discussion_id),
+
+    -- Strani ključevi
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);

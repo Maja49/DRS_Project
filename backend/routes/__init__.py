@@ -1,7 +1,7 @@
-from flask import Blueprint
-
-# Ovo omogućava import Blueprint-ova iz modula
 from .theme import theme_bp
+from .auth import auth_bp
+from .admin import admin_bp
+from .discussion import discussion_bp
 
-# Lista Blueprint-ova koje registrujemo
-__all__ = ['theme_bp']
+
+__all__ = ['theme_bp', 'auth_bp', 'admin_bp', 'discussion_bp']

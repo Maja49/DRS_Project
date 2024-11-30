@@ -1,9 +1,7 @@
 #kreiranje baze podadaka i definisanje korisnickog modela za SQLAlchemy
 #ova klasa je povezana sa tabelom u bazi User
 
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from . import db  # Import baze iz models/__init__.py
 
 #model za korisnicke podatke u bazi
 #klasa User nasljedjuje db.Model, znaci koristi SQLAlchemy za njeno mapiranje na tabelu u bazi
