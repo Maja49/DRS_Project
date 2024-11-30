@@ -4,8 +4,12 @@ from models import db
 from flask_socketio import SocketIO
 import config
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
+
+# Omogućite CORS za celu aplikaciju
+CORS(app, origins="http://localhost:5173")
 
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
@@ -44,3 +48,5 @@ if __name__ == '__main__':
         db.create_all()  # kreira tabele u bazi ako ne postoje
                          #provjerava sve modele iz aplikacije i na osnovu nih kreira odgovarajuce tabele u bazi, ako ne postoji
     app.run(debug=True)  #pokretanje aplikacije
+    
+

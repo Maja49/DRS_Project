@@ -1,0 +1,40 @@
+/* Stil za glavni kontejner */
+.user-container {
+  position: relative;
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Stil za ikonicu */
+.user-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+/* Stil za glavni sadržaj */
+.user-content {
+  text-align: center;
+  margin-top: 20%;
+}
+
+.user-content h1 {
+  font-size: 2rem;
+  color: #343a40;
+}
+
+.user-content p {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+/* Dodaj stilove za modal (ako su potrebni dodatni) */
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  color: #007bff;
+}

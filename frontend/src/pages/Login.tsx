@@ -1,0 +1,93 @@
+import React, { useState } from "react";
+import { MDBContainer } from "mdb-react-ui-kit";
+import "./Login.css";
+
+const Login: React.FC = () => {
+  // Stanje za email, password i errorMessage
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Handler za prijavu
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!email || !password) {
+      setErrorMessage("Please fill in both fields");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.token) {
+        // Ako je token vraćen u odgovoru
+        // Spremanje tokena u localStorage
+        localStorage.setItem("auth_token", data.token);
+        // Ako je korisnik admin, preusmeravanje na admin stranicu
+        if (data.isAdmin) {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/user";
+        }
+      } else {
+        setErrorMessage(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setErrorMessage("Something went wrong!");
+    }
+  };
+
+  return (
+    <MDBContainer className="login-container">
+      <h2>Welcome Back</h2>
+      <p>Login to access your account</p>
+
+      <form onSubmit={handleLogin}>
+        {/* Email Input */}
+        <input
+          type="email"
+          className="form-input"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        {/* Password Input */}
+        <input
+          type="password"
+          className="form-input"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        {/* Error Message */}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+        {/* Login Button */}
+        <button type="submit" className="btn">
+          Login
+        </button>
+
+        {/* Signup Link */}
+        <a href="/signup" className="signup-link">
+          Don't have an account? Sign Up
+        </a>
+      </form>
+    </MDBContainer>
+  );
+};
+
+export default Login;
