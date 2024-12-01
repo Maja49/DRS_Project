@@ -1,6 +1,6 @@
 from flask import request, jsonify, Blueprint
 from models import db
-from models.discussion import Discussion
+from models import Discussion
 from models.theme import Theme
 from models.likeDislike import LikeDislike
 from models.comment import Comment
