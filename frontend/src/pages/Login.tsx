@@ -27,17 +27,18 @@ const Login: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log(data);
 
       if (data.token) {
         // Ako je token vraćen u odgovoru
         // Spremanje tokena u localStorage
         localStorage.setItem("auth_token", data.token);
         // Ako je korisnik admin, preusmeravanje na admin stranicu
-        if (data.isAdmin) {
-          window.location.href = "/admin";
-        } else {
-          window.location.href = "/user";
-        }
+        // if (data.is_admin) {
+        // //   window.location.href = "/admin";
+        // // } else {
+        // //   window.location.href = "/user";
+        // // }
       } else {
         setErrorMessage(data.message || "Login failed");
       }

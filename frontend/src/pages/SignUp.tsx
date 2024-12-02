@@ -4,12 +4,12 @@ import "./SignUp.css";
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    address: "",
+    name: "",
+    lastname: "",
+    adress: "",
     city: "",
     country: "",
-    phone: "",
+    phone_number: "",
     email: "",
     password: "",
     confirmPassword: "",
