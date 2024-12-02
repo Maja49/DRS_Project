@@ -1,6 +1,6 @@
 from flask import request, jsonify, Blueprint
 from models import db
-from models import Discussion
+from models.discussion import Discussion
 from models.theme import Theme
 from models.likeDislike import LikeDislike
 from models.comment import Comment
@@ -145,10 +145,25 @@ def delete_discussion(discussion_id):
     
 
 @discussion_bp.route('/like_dislike/<int:discussion_id>', methods=['POST'])
-@jwt_required()
 def like_dislike_discussion(discussion_id):
-    user_id = get_jwt_identity()  # Preuzima ID korisnika iz JWT tokena
+    # Uzmi token iz Authorization zaglavlja
+    token = request.headers.get('Authorization')
+
+    if not token:
+        return jsonify({"message": "Token is missing"}), 403
     
+    # Uklanjamo 'Bearer ' deo iz tokena i uzimamo samo token
+    token = token.split()[1]
+
+    # Validacija tokena, ekstraktujemo korisnički ID
+    decoded = decode_token(token)
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    user_id = decoded.get('user_id')  # Dobijamo ID korisnika iz tokena
+    if not user_id:
+        return jsonify({"message": "User ID not found in token"}), 403
+
     # Preuzimanje podataka iz JSON zahteva
     data = request.get_json()
     action = data.get('action')  # Može biti "like" ili "dislike"
@@ -190,9 +205,26 @@ def like_dislike_discussion(discussion_id):
 
 
 @discussion_bp.route('/comment/<int:discussion_id>', methods=['POST'])
-@jwt_required()
 def comment_discussion(discussion_id):
-    user_id = get_jwt_identity()  # Preuzima ID korisnika iz JWT tokena
+    # Uzmi token iz Authorization zaglavlja
+    token = request.headers.get('Authorization')
+
+    if not token:
+        return jsonify({"message": "Token is missing"}), 403
+    
+    # Uklanjamo 'Bearer ' deo iz tokena i uzimamo samo token
+    token = token.split()[1]
+
+    # Validacija tokena, ekstraktujemo korisnički ID
+    decoded = decode_token(token)
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    user_id = decoded.get('user_id')  # Dobijamo ID korisnika iz tokena
+    if not user_id:
+        return jsonify({"message": "User ID not found in token"}), 403
+
+    # Preuzimanje podataka iz JSON zahteva
     data = request.get_json()
     text = data.get('text')
     mentioned_user_id = data.get('mentioned_user_id')  # Opcionalno

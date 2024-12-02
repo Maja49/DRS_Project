@@ -57,8 +57,6 @@ select * from user
 DROP TABLE theme;
 DROP TABLE comment;
 DROP TABLE discussion;
-<<<<<<< Updated upstream
-=======
 
 CREATE TABLE comment (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- Auto-incrementing ID
@@ -145,4 +143,3 @@ FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE;
 -- Uklanjanje kolone post_id ako više nije potrebna
 ALTER TABLE comment 
 DROP COLUMN post_id;
->>>>>>> Stashed changes

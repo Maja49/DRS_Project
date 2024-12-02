@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from models import db
@@ -25,6 +23,4 @@ class Comment(db.Model):
         self.text = text
         self.mentioned_user_id = mentioned_user_id
 
-    def __repr__(self):
-        return f'<Comment {self.id}, User {self.user_id}, Mentioned User {self.mentioned_user_id}>'
->>>>>>> Stashed changes
+    def __repr__(self):        return f'<Comment {self.id}, User {self.user_id}, Mentioned User {self.mentioned_user_id}>'

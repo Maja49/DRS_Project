@@ -22,8 +22,7 @@ class User(db.Model):
     is_approved = db.Column(db.Boolean, default=False) 
     
     # Promeni naziv backref-a na nešto drugo
-    likes_dislikes_user = db.relationship('LikeDislike', backref='user_likes_dislikes', lazy=True)
-
+    likes_dislikes = db.relationship('LikeDislike', back_populates='user', lazy=True)
     
 
 
