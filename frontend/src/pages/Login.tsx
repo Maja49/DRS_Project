@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { MDBContainer } from "mdb-react-ui-kit";
+import {jwtDecode} from 'jwt-decode'; //  import
 import "./Login.css";
 
+// Definisanje tipa za dekodirani token
+interface DecodedToken {
+  user_id: string;
+  is_admin: boolean;
+}
+
 const Login: React.FC = () => {
-  // Stanje za email, password i errorMessage
+  // Stanje za email, password, errorMessage, username i isAdmin
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -30,15 +37,19 @@ const Login: React.FC = () => {
       console.log(data);
 
       if (data.token) {
-        // Ako je token vraćen u odgovoru
         // Spremanje tokena u localStorage
         localStorage.setItem("auth_token", data.token);
-        // Ako je korisnik admin, preusmeravanje na admin stranicu
-        // if (data.is_admin) {
-        // //   window.location.href = "/admin";
-        // // } else {
-        // //   window.location.href = "/user";
-        // // }
+
+        const decoded = jwtDecode<DecodedToken>(data.token);  
+        localStorage.setItem("user_id", decoded.user_id); 
+        localStorage.setItem("is_admin", decoded.is_admin ? "true" : "false"); 
+
+        // Preusmeravanje na odgovarajuću stranicu
+        if (decoded.is_admin) {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/home";
+        }
       } else {
         setErrorMessage(data.message || "Login failed");
       }

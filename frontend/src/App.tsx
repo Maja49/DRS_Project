@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Admin from "./pages/Admin";
 import User from "./pages/User";
+import Home from "./pages/Home";
 import "./App.css";
 
 const App: React.FC = () => {
@@ -22,6 +23,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/user" element={<User />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   );

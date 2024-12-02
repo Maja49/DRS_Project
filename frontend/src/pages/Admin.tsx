@@ -9,6 +9,8 @@ interface User {
 }
 
 const Admin: React.FC = () => {
+  const username = localStorage.getItem("user_id") || "Admin";
+
   const [users, setUsers] = useState<User[]>([]); // Stanje za čuvanje liste korisnika
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +37,8 @@ const Admin: React.FC = () => {
   return (
     <div className="admin-container">
       <h1>Admin Panel</h1>
+      <h1>Welcome, Admin {username}</h1>
+
       {error ? (
         <p className="error">{error}</p>
       ) : (

@@ -1,0 +1,116 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px;
+    background-color: #4a90e2;
+   /* background-color: rgb(255, 184, 126);*/
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0; 
+    width: 100%; 
+    height: 55px; 
+    z-index: 1000; /* Navbar iznad ostalih elemenata */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Blaga senka */
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: top;
+  }
+  
+  .logo {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin-top: -30px;
+    margin-left: -30px;
+}
+
+
+  
+  .app-name {
+    font-size: 1.2rem; 
+    font-family: 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    margin-top: 7px;
+    margin-left: -15px;
+  }
+
+  .navbar-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .search-container {
+    position: relative;
+    width: 40%; 
+    height: 20px;
+    margin-top: -35px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px 40px 10px 20px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    border-color: #4CAF50;
+  }
+  
+  .search-input::placeholder {
+    color: #aaa;
+    transition: opacity 0.3s ease;
+  }
+  
+  .search-input:focus::placeholder {
+    opacity: 0; /* Nestaje placeholder kada korisnik kuca */
+  }
+  
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 18px;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .login-button {
+    background-color: #61dafb;
+    border: none;
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .login-button:hover {
+    background-color: #21a1f1;
+  }
+  
+  .profile-icon{
+    height: 50px;
+    width: 50px;
+    margin-bottom: 25px;
+    margin-right: -5px;
+  }
+  
