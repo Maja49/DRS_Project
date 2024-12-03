@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp, discussion_bp
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp
 from models import db
 import config
 
@@ -29,6 +29,10 @@ app.register_blueprint(theme_bp, url_prefix='/api/theme')
 
 # Registrovanje discussion Blueprint-a
 app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
+
+# Registrovanje comment Blueprint-a
+app.register_blueprint(comment_bp, url_prefix='/api/comment')  
+
 
 if __name__ == '__main__':
     with app.app_context():

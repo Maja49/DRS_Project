@@ -206,48 +206,57 @@ def like_dislike_discussion(discussion_id):
 
 @discussion_bp.route('/comment/<int:discussion_id>', methods=['POST'])
 def comment_discussion(discussion_id):
-    # Uzmi token iz Authorization zaglavlja
+    # Provera tokena iz Authorization zaglavlja
     token = request.headers.get('Authorization')
-
     if not token:
-        return jsonify({"message": "Token is missing"}), 403
-    
-    # Uklanjamo 'Bearer ' deo iz tokena i uzimamo samo token
-    token = token.split()[1]
+        return jsonify({"message": "Authorization token is missing"}), 401
 
-    # Validacija tokena, ekstraktujemo korisnički ID
+    try:
+        # Ekstrakcija tokena (uklanjanje "Bearer " prefiksa)
+        token = token.split()[1]
+    except IndexError:
+        return jsonify({"message": "Invalid token format"}), 400
+
+    # Validacija i dekodovanje tokena
     decoded = decode_token(token)
     if "error" in decoded:
         return jsonify({"message": decoded["error"]}), 403
 
-    user_id = decoded.get('user_id')  # Dobijamo ID korisnika iz tokena
+    user_id = decoded.get('user_id')  # Izvlačenje ID korisnika iz tokena
     if not user_id:
         return jsonify({"message": "User ID not found in token"}), 403
 
-    # Preuzimanje podataka iz JSON zahteva
+    # Preuzimanje JSON podataka iz zahteva
     data = request.get_json()
+    if not data:
+        return jsonify({"message": "Invalid JSON data"}), 400
+
     text = data.get('text')
     mentioned_user_id = data.get('mentioned_user_id')  # Opcionalno
 
-    if not text:
-        return jsonify({"message": "Text is required"}), 400
+    # Validacija teksta komentara
+    if not text or not text.strip():
+        return jsonify({"message": "Text is required and cannot be empty"}), 400
 
+    # Provera da li diskusija postoji
     discussion = Discussion.query.get(discussion_id)
     if not discussion:
         return jsonify({"message": "Discussion not found"}), 404
 
-    # Kreiranje komentara
+    # Kreiranje novog komentara
     new_comment = Comment(
         user_id=user_id,
-        post_id=discussion_id,
-        text=text,
+        discussion_id=discussion_id,
+        text=text.strip(),
         mentioned_user_id=mentioned_user_id
     )
 
     try:
+        # Dodavanje komentara u bazu
         db.session.add(new_comment)
         db.session.commit()
         return jsonify({"message": "Comment added successfully"}), 201
     except Exception as e:
+        # Povratak na prethodno stanje baze u slučaju greške
         db.session.rollback()
-        return jsonify({"message": str(e)}), 500
+        return jsonify({"message": f"Database error: {str(e)}"}), 500
