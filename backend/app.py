@@ -2,8 +2,13 @@ from flask import Flask
 from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp
 from models import db
 import config
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+from flask_socketio import SocketIO
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
+
+CORS(app, origins="https://localhost:5173")
 
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
