@@ -102,42 +102,93 @@ const AdminPage: React.FC = () => {
     fetchRegistrationRequests();
   }, []);
 
+  const username = localStorage.getItem("user_id") || "Guest";
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
+  const handleSearch = () => {
+    fetch(`/api/discussions/search?query=${searchQuery}`)
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/Login"; // Redirect to login page
+  };
+
   return (
-    <div className="admin-page">
-      <h1>Admin Dashboard</h1>
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-      {!errorMessage && requests.length === 0 && (
-        <p>No pending registration requests.</p>
-      )}
-      <ul>
-        {requests.map((req) => (
-          <li key={req.id} className="request-item">
-            <p>
-              <strong>Name:</strong> {req.name} {req.lastname}
-            </p>
-            <p>
-              <strong>Email:</strong> {req.email}
-            </p>
-            <p>
-              <strong>Username:</strong> {req.username}
-            </p>
-            <div className="action-buttons">
-              <button
-                className="accept-button"
-                onClick={() => handleAccept(req.id)}
-              >
-                Accept
+    <div>
+      <nav className="navbar">
+        <div className="navbar-left">
+          <img src="/icon.png" alt="Logo" className="logo" />
+          <h1 className="app-name">Chatify</h1>
+        </div>
+        <div className="navbar-center">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onBlur={handleSearch}
+              className="search-input"
+            />
+            <img src="/search.png" alt="Search Icon" className="search-icon" />
+          </div>
+        </div>
+        <div className="navbar-right">
+          <div
+            className="profile-section"
+            onClick={() => setDropdownVisible(!dropdownVisible)}
+          >
+            <img src="/profile.png" alt="Profile" className="profile-icon" />
+            <span className="username">{username}</span>
+            <div className={`dropdown-menu ${dropdownVisible ? "active" : ""}`}>
+              <button onClick={() => (window.location.href = "/user")}>
+                Edit Profile
               </button>
-              <button
-                className="reject-button"
-                onClick={() => handleReject(req.id)}
-              >
-                Reject
-              </button>
+              <button onClick={handleLogout}>Logout</button>
             </div>
-          </li>
-        ))}
-      </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div className="admin-page">
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {!errorMessage && requests.length === 0 && (
+          <p className="no-requests">No pending registration requests.</p>
+        )}
+        <ul>
+          {requests.map((req) => (
+            <li key={req.id} className="request-item">
+              <p>
+                <strong>Name:</strong> {req.name} {req.lastname}
+              </p>
+              <p>
+                <strong>Email:</strong> {req.email}
+              </p>
+              <p>
+                <strong>Username:</strong> {req.username}
+              </p>
+              <div className="action-buttons">
+                <button
+                  className="accept-button"
+                  onClick={() => handleAccept(req.id)}
+                >
+                  Accept
+                </button>
+                <button
+                  className="reject-button"
+                  onClick={() => handleReject(req.id)}
+                >
+                  Reject
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
 
       const data = await response.json();
 
-      if (data.message === "Korisnik uspešno registrovan") {
+      if (data.message === "User registered successfully") {
         window.location.href = "/login";
       } else {
         setErrorMessage(data.message || "Registracija nije uspela");

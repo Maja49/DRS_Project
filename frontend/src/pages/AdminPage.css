@@ -1,63 +1,97 @@
 .admin-page {
   padding: 20px;
   font-family: Arial, sans-serif;
+  max-width: 1000px; /* Širina stranice veća kako bi stalo više sadržaja */
+  margin: 0 auto;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #333;
 }
 
 .error-message {
-  color: red;
+  color: #e53935;
+  background-color: #fdecea;
+  padding: 10px;
   text-align: center;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
 
 ul {
   list-style-type: none;
   padding: 0;
+  display: flex;
+  flex-wrap: wrap; /* Omogućava prelamanje u više redova ako nema dovoljno prostora */
+  gap: 20px; /* Razmak između stavki */
 }
 
 .request-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: calc(33.33% - 20px); /* Širina svakog elementa u kolonama (3 kolone) */
   display: flex;
   flex-direction: column;
+  margin-bottom: 15px;
+  min-width: 300px; /* Osigurava minimalnu širinu za svaki "request-item" */
+  box-sizing: border-box; /* Uključuje padding u ukupnu širinu */
 }
 
 .request-item p {
   margin: 5px 0;
+  color: #555;
+}
+
+.request-item p strong {
+  color: #333;
 }
 
 .action-buttons {
   display: flex;
+  justify-content: space-between; /* Postavljanje dugmadi sa razmakom između */
   gap: 10px;
+  margin-top: 15px;
+}
+
+.accept-button,
+.reject-button {
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  width: 48%; /* Svako dugme će zauzeti 48% širine roditeljskog elementa */
 }
 
 .accept-button {
   background-color: #4caf50;
   color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 3px;
 }
 
 .reject-button {
   background-color: #f44336;
   color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 3px;
 }
 
 .accept-button:hover {
   background-color: #45a049;
+  box-shadow: 0 2px 5px rgba(0, 128, 0, 0.2);
 }
 
 .reject-button:hover {
   background-color: #e53935;
+  box-shadow: 0 2px 5px rgba(255, 0, 0, 0.2);
+}
+
+.no-requests {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
 }

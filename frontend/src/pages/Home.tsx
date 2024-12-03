@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import './Home.css';
-
-
+import React, { useState } from "react";
+import "./Home.css";
 
 interface DiscussionProps {
   title: string;
@@ -10,7 +8,12 @@ interface DiscussionProps {
   text: string;
 }
 
-const Discussion: React.FC<DiscussionProps> = ({ title, content, author, text }) => {
+const Discussion: React.FC<DiscussionProps> = ({
+  title,
+  content,
+  author,
+  text,
+}) => {
   const [likes, setLikes] = useState<number>(0);
   const [dislikes, setDislikes] = useState<number>(0);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
@@ -50,23 +53,23 @@ const Discussion: React.FC<DiscussionProps> = ({ title, content, author, text })
 
   return (
     <div className="discussion-card">
-    <div className="discussion-header">
-      <p className="topic">{title}</p>
-      <h3 className="discussion-title">{content}</h3>
-      <p className="discussion-author">{author}</p>
-    </div>
-    <div className="discussion-text">
+      <div className="discussion-header">
+        <p className="topic">{title}</p>
+        <h3 className="discussion-title">{content}</h3>
+        <p className="discussion-author">{author}</p>
+      </div>
+      <div className="discussion-text">
         {content.length > 100 ? `${text.slice(0, 100)}...` : text}
-    </div>
-    <div className="discussion-actions">
-      <button
-        className={`like-button ${hasLiked ? 'active' : ''}`}
-        onClick={handleLike}
-      >
+      </div>
+      <div className="discussion-actions">
+        <button
+          className={`like-button ${hasLiked ? "active" : ""}`}
+          onClick={handleLike}
+        >
           ❤️ {likes}
         </button>
         <button
-          className={`dislike-button ${hasDisliked ? 'active' : ''}`}
+          className={`dislike-button ${hasDisliked ? "active" : ""}`}
           onClick={handleDislike}
         >
           💔 {dislikes}
@@ -80,8 +83,8 @@ const Discussion: React.FC<DiscussionProps> = ({ title, content, author, text })
 };
 
 const Home: React.FC = () => {
-  const username = localStorage.getItem('user_id') || 'Guest';
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const username = localStorage.getItem("user_id") || "Guest";
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
   const handleSearch = () => {
@@ -92,7 +95,7 @@ const Home: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = '/Login'; // Redirect to login page
+    window.location.href = "/Login"; // Redirect to login page
   };
 
   return (
@@ -122,8 +125,8 @@ const Home: React.FC = () => {
           >
             <img src="/profile.png" alt="Profile" className="profile-icon" />
             <span className="username">{username}</span>
-            <div className={`dropdown-menu ${dropdownVisible ? 'active' : ''}`}>
-              <button onClick={() => (window.location.href = '/user')}>
+            <div className={`dropdown-menu ${dropdownVisible ? "active" : ""}`}>
+              <button onClick={() => (window.location.href = "/user")}>
                 Edit Profile
               </button>
               <button onClick={handleLogout}>Logout</button>
@@ -137,14 +140,14 @@ const Home: React.FC = () => {
         <Discussion
           title="React vs Angular"
           content="Which one do you prefer and why?"
-          text = "Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
+          text="Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
           author="John Doe"
         />
         <Discussion
           title="Best practices for REST APIs"
           content="Share your favorite tips for designing RESTful APIs."
           author="Jane Smith"
-          text = "Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
+          text="Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
         />
       </div>
     </div>
