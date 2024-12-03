@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MDBContainer } from "mdb-react-ui-kit";
-import {jwtDecode} from 'jwt-decode'; //  import
+import { jwtDecode } from "jwt-decode"; //  import
 import "./Login.css";
 
 // Definisanje tipa za dekodirani token
@@ -40,9 +40,9 @@ const Login: React.FC = () => {
         // Spremanje tokena u localStorage
         localStorage.setItem("auth_token", data.token);
 
-        const decoded = jwtDecode<DecodedToken>(data.token);  
-        localStorage.setItem("user_id", decoded.user_id); 
-        localStorage.setItem("is_admin", decoded.is_admin ? "true" : "false"); 
+        const decoded = jwtDecode<DecodedToken>(data.token);
+        localStorage.setItem("user_id", decoded.user_id);
+        localStorage.setItem("is_admin", decoded.is_admin ? "true" : "false");
 
         // Preusmeravanje na odgovarajuću stranicu
         if (decoded.is_admin) {
