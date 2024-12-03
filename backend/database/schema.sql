@@ -71,6 +71,7 @@ CREATE TABLE comment (
     FOREIGN KEY (mentioned_user_id) REFERENCES users(id) ON DELETE SET NULL  -- povezivanje sa tabelom 'users', opcionalno
 ); 
 
+
 CREATE TABLE discussion (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- Jedinstveni ID diskusije
     text TEXT NOT NULL,                 -- Tekst diskusije
@@ -118,3 +119,27 @@ CREATE TABLE commentdiscussion (
     FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
     FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
 );
+
+CREATE TABLE like_dislike (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- Primarni ključ sa automatskim povećanjem
+    user_id INT NOT NULL,              -- ID korisnika koji lajkuje/dislajkuje
+    discussion_id INT NOT NULL,        -- ID diskusije na koju se odnosi akcija
+    action ENUM('like', 'dislike') NOT NULL, -- Akcija: može biti 'like' ili 'dislike'
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE, -- Veza sa tabelom users
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE -- Veza sa tabelom discussion
+);
+
+
+-- Izmena tabele za komentare
+-- Dodavanje nove kolone discussion_id
+ALTER TABLE comment 
+ADD COLUMN discussion_id INT NOT NULL;
+
+-- Povezivanje discussion_id sa tabelom discussion
+ALTER TABLE comment 
+ADD CONSTRAINT fk_comment_discussion
+FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE;
+
+-- Uklanjanje kolone post_id ako više nije potrebna
+ALTER TABLE comment 
+DROP COLUMN post_id;
