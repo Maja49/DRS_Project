@@ -8,7 +8,7 @@ from flask_socketio import SocketIO
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
 
-CORS(app, origins="https://localhost:5173")
+CORS(app, origins="http://localhost:5173")
 
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
