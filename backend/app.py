@@ -1,15 +1,9 @@
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp, discussion_bp
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp
 from models import db
-from flask_socketio import SocketIO
 import config
-from flask_jwt_extended import JWTManager
-from flask_cors import CORS
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
-
-# Omogućite CORS za celu aplikaciju
-CORS(app, origins="http://localhost:5173")
 
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
@@ -33,20 +27,15 @@ app.register_blueprint(admin_bp, url_prefix='/api/admin')
 #ruta za temu
 app.register_blueprint(theme_bp, url_prefix='/api/theme')
 
+# Registrovanje discussion Blueprint-a
 app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
 
-# Secret key for signing JWTs
-app.config['SECRET_KEY'] = 'your-secret-key'
-# JWT token location (commonly in headers or cookies)
-app.config['JWT_TOKEN_LOCATION'] = ['headers']  # You can also use 'cookies' or both
+# Registrovanje comment Blueprint-a
+app.register_blueprint(comment_bp, url_prefix='/api/comment')  
 
-# Initialize JWT manager
-jwt = JWTManager(app)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # kreira tabele u bazi ako ne postoje
                          #provjerava sve modele iz aplikacije i na osnovu nih kreira odgovarajuce tabele u bazi, ako ne postoji
     app.run(debug=True)  #pokretanje aplikacije
-    
-
