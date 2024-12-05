@@ -7,6 +7,7 @@ import "./Login.css";
 interface DecodedToken {
   user_id: string;
   is_admin: boolean;
+  username: string;
 }
 
 const Login: React.FC = () => {
@@ -43,6 +44,7 @@ const Login: React.FC = () => {
         const decoded = jwtDecode<DecodedToken>(data.token);
         localStorage.setItem("user_id", decoded.user_id);
         localStorage.setItem("is_admin", decoded.is_admin ? "true" : "false");
+        localStorage.setItem("username", decoded.username);
 
         // Preusmeravanje na odgovarajuću stranicu
         if (decoded.is_admin) {

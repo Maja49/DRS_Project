@@ -1,225 +1,343 @@
-body,
-html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Trebuchet MS', sans-serif;
+    background-image: url('background.jpg');
+   
+    
+  }
+  /* Osnovne postavke za scroll bar */
+::-webkit-scrollbar {
+  width: 12px;  /* Širina scroll-bar-a */
+  height: 12px; /* Visina horizontalnog scroll-bar-a */
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 15px;
-  background-color: #4a90e2;
-  /* background-color: rgb(255, 184, 126);*/
-  color: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 55px;
-  z-index: 1000; /* Navbar iznad ostalih elemenata */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Blaga senka */
+/* Boja pozadine scroll-bar-a */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Pozadina */
 }
 
-.navbar-left {
-  display: flex;
-  align-items: top;
+/* Boja samog scroll-bar-a */
+::-webkit-scrollbar-thumb {
+  background-color: #7ad8fc; /* Boja scroll-bar-a */
+  border-radius: 10px; /* Zaobljeni kutovi */
 }
 
-.logo {
-  display: inline-block;
-  width: auto;
-  height: auto;
-  margin-top: -30px;
-  margin-left: -30px;
+/* Boja scroll-bar-a kada je u fokusu (npr. kada ga korisnik vuče) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #3b5a8b; /* Tamnija boja kada je u fokusu */
 }
 
-.app-name {
-  font-size: 1.2rem;
-  font-family: "Trebuchet MS", sans-serif;
-  font-weight: bold;
-  margin-top: 7px;
-  margin-left: -15px;
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px;
+    background-color: #4a90e2;
+   /* background-color: rgb(255, 184, 126);*/
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0; 
+    width: 100%; 
+    height: 55px; 
+    z-index: 1000; /* Navbar iznad ostalih elemenata */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Blaga senka */
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: top;
+  }
+  
+  .logo {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin-top: -30px;
+    margin-left: -30px;
 }
 
-.navbar-center {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-}
 
-.search-container {
-  position: relative;
-  width: 40%;
-  height: 20px;
-  margin-top: -35px;
-  align-items: center;
-  right: 50px;
-}
+  
+  .app-name {
+    font-size: 1.2rem; 
+    font-family: 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+    margin-top: 7px;
+    margin-left: -15px;
+    color: white;
+  }
 
-.search-input {
-  width: 100%;
-  padding: 10px 40px 10px 20px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
-  align-items: center;
-}
+  .navbar-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .search-container {
+    position: relative;
+    width: 40%; 
+    height: 20px;
+    margin-top: -35px;
+    align-items: center;
+    right: 50px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px 40px 10px 20px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    align-items: center;
+  }
+  
+  .search-input:focus {
+    border-color: #4CAF50;
+  }
+  
+  .search-input::placeholder {
+    color: #aaa;
+    transition: opacity 0.3s ease;
+  }
+  
+  .search-input:focus::placeholder {
+    opacity: 0; /* Nestaje placeholder kada korisnik kuca */
+  }
+  
+  .search-icon {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 18px;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .login-button {
+    background-color: #61dafb;
+    border: none;
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .login-button:hover {
+    background-color: #21a1f1;
+  }
+  
+  .profile-icon{
+    height: 50px;
+    width: 50px;
+    margin-bottom: 25px;
+    margin-right: -5px;
+  }
 
-.search-input:focus {
-  border-color: #4caf50;
-}
+  .profile-section {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 80%; 
+    right: -7px;
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 150px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; 
+  }
+  
+  .profile-section:hover .dropdown-menu,
+  .profile-section .dropdown-menu.active {
+    display: block; 
+  }
+  
+  .dropdown-menu button {
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu button:hover {
+    background-color: #f0f0f0;
+  }
 
-.search-input::placeholder {
-  color: #aaa;
-  transition: opacity 0.3s ease;
-}
+ 
+  .discussions-section {
+    position: relative;
+    margin-top: 1300px; 
+  }
+  
+  
+  
+  .discussion-card {
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 900px;
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .discussion-header {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between; 
+  }
+  
+  .topic {
+    font-size: 12px;
+    color: #888;
+    text-align: left;
+  }
 
-.search-input:focus::placeholder {
-  opacity: 0; /* Nestaje placeholder kada korisnik kuca */
-}
+  .discussion-created {
+    font-size: 12px;
+    color: #888;
+    text-align: left;
+  }
+  
+  .discussion-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .discussion-author
+  {
+    text-align: left;
+    font-size: 12px;
+  }
+  .discussion-text {
+    font-size: 12px;
+    font-weight: bold;
+    line-clamp: 4;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: normal; 
+    width: 100%; 
+    text-align: left;
+  }
+  
+  
+  .discussion-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .like-button,
+  .dislike-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
 
-.search-icon {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-  transform: translateY(-50%);
-  color: #aaa;
-  font-size: 18px;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-}
-
-.login-button {
-  background-color: #61dafb;
-  border: none;
-  padding: 5px 12px;
-  font-size: 0.9rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.login-button:hover {
-  background-color: #21a1f1;
-}
-
-.profile-icon {
-  height: 50px;
-  width: 50px;
-  margin-bottom: 25px;
-  margin-right: -5px;
-}
-
-.profile-section {
-  position: relative;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 80%;
-  right: -7px;
-  background-color: white;
-  color: black;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 150px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  display: none; /* Skriveno dok nije aktivno */
-}
-
-.profile-section:hover .dropdown-menu,
-.profile-section .dropdown-menu.active {
-  display: block;
-}
-
-.dropdown-menu button {
-  width: 100%;
-  padding: 10px;
-  text-align: left;
-  background-color: transparent;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.dropdown-menu button:hover {
-  background-color: #f0f0f0;
-}
-
-.discussions-section {
-  margin-top: 80px;
-  padding: 20px;
-}
-
-.discussion-card {
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 700px;
-  height: auto; /* Adjust the height to be dynamic */
+.comment-section {
   display: flex;
   flex-direction: column;
-}
-
-.discussion-header {
-  margin-bottom: 10px;
-}
-
-.topic {
-  font-size: 12px;
-  color: #888;
-  text-align: left;
-}
-
-.discussion-title {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: left;
-}
-
-.discussion-author {
-  text-align: left;
-  font-size: 12px;
-}
-.discussion-text {
-  font-size: 12px;
-  font-weight: bold;
-  line-clamp: 4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-  width: 100%;
-}
-
-.discussion-actions {
+  align-items: flex-start;
   margin-top: 10px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.like-button,
-.dislike-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  margin-right: 10px;
 }
 
 .comment-button {
-  background-color: transparent;
+  background: none;
   border: none;
-  font-size: 16px;
   cursor: pointer;
-  margin-left: 10px;
+  font-size: 1.5rem;
+  color: #888;
+  padding: 5px;
 }
+
+.comment-input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 10px;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-input-container input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.comment-input-container .comment-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cancel-button {
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #ff5062;
+  color: white;
+  border-radius: 5px;
+}
+
+.add-comment-button {
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #74b3fc;
+  color: white;
+  border-radius: 5px;
+}
+
+.cancel-button:hover {
+  background-color: #b52937;
+}
+
+.add-comment-button:hover {
+  background-color: #357ab7;
+}
+
+.comments-list {
+  margin-top: 10px;
+}
+
+.comment {
+  background-color: #e0f7fa;
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+  

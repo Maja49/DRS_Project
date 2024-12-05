@@ -25,9 +25,12 @@ def get_all_discussions():
             discussions_data.append({
                 "id": discussion.id,
                 "text": discussion.text,
+                "title": discussion.title,
                 "theme_name": discussion.theme.name,
                 "created_at": discussion.created_at.isoformat(),  # Convert to ISO format for better readability
-                "updated_at": discussion.updated_at.isoformat() if discussion.updated_at else None  # If updated_at is None, set to None
+                "updated_at": discussion.updated_at.isoformat() if discussion.updated_at else None,  # If updated_at is None, set to None
+                "likes": discussion.likes,
+                "dislikes": discussion.dislikes,
             })
 
         return jsonify({
@@ -366,6 +369,7 @@ def search_discussions():
         results.append({
             "id": discussion.id,
             "text": discussion.text,
+            "title": discussion.title,
             "theme": discussion.theme.name,
             "user": {
                 "id": discussion.user_id,

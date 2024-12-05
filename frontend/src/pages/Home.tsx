@@ -1,23 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 import "./Home.css";
 
 interface DiscussionProps {
-  title: string;
-  content: string;
-  author: string;
+  id: number;
   text: string;
+  title: string;
+  theme_name: string;
+  created_at: string;
+  updated_at?: string | null;
+  likes: number;
+  dislikes: number;
 }
 
 const Discussion: React.FC<DiscussionProps> = ({
-  title,
-  content,
-  author,
+  id,
   text,
+  title,
+  theme_name,
+  created_at,
+  updated_at,
+  likes: initialLikes,
+  dislikes: initialDislikes,
 }) => {
-  const [likes, setLikes] = useState<number>(0);
-  const [dislikes, setDislikes] = useState<number>(0);
+  const [likes, setLikes] = useState<number>(initialLikes);
+  const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
+  const [comments, setComments] = useState<string[]>([]);
+  const [newComment, setNewComment] = useState<string>("");
+  const [isCommentSectionVisible, setIsCommentSectionVisible] = useState<boolean>(false);
 
   const handleLike = () => {
     if (!hasLiked) {
@@ -47,20 +59,32 @@ const Discussion: React.FC<DiscussionProps> = ({
     }
   };
 
-  const handleCommentClick = () => {
-    window.location.href = "/Discussion";
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewComment(e.target.value);
   };
+
+  const handleAddComment = () => {
+    if (newComment.trim() !== "") {
+      setComments([...comments, newComment]);
+      setNewComment("");
+    }
+  };
+
+  const handleCancelComment = () => {
+    setNewComment(""); // Clears the input field
+  };
+
+ /* const formattedTime = formatDistanceToNow(new Date(created_at), { addSuffix: true });*/
 
   return (
     <div className="discussion-card">
       <div className="discussion-header">
-        <p className="topic">{title}</p>
-        <h3 className="discussion-title">{content}</h3>
-        <p className="discussion-author">{author}</p>
+        <p className="topic">{theme_name}</p>
+        <p className="discussion-created">{created_at}</p>
+        {updated_at && <p className="discussion-updated">Updated At: {updated_at}</p>}
       </div>
-      <div className="discussion-text">
-        {content.length > 100 ? `${text.slice(0, 100)}...` : text}
-      </div>
+      <p className="discussion-title">{title}</p>
+      <div className="discussion-text">{text}</div>
       <div className="discussion-actions">
         <button
           className={`like-button ${hasLiked ? "active" : ""}`}
@@ -74,23 +98,100 @@ const Discussion: React.FC<DiscussionProps> = ({
         >
           💔 {dislikes}
         </button>
-        <button className="comment-button" onClick={handleCommentClick}>
-          💬
-        </button>
-      </div>
+        <button 
+            className="comment-button" 
+            onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+          >
+            💬
+          </button>
+          </div>
+
+        <div className="comment-section">
+          
+          {isCommentSectionVisible && (
+            <div className="comment-input-container">
+              <input
+                type="text"
+                placeholder={newComment === "" ? "Add Comment..." : ""}
+                value={newComment}
+                onChange={handleCommentChange}
+                onFocus={() => {}}
+              />
+              <div className="comment-buttons">
+                <button className="cancel-button" onClick={handleCancelComment}>Cancel</button>
+                <button className="add-comment-button" onClick={handleAddComment}>Comment</button>
+              </div>
+            </div>
+          )}
+
+          <div className="comments-list">
+            {comments.map((comment, index) => (
+              <div key={index} className="comment">
+                {comment}
+              </div>
+            ))}
+          </div>
+        </div>
     </div>
   );
 };
 
 const Home: React.FC = () => {
   const username = localStorage.getItem("user_id") || "Guest";
+  const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
-  const handleSearch = () => {
-    fetch(`/api/discussions/search?query=${searchQuery}`)
-      .then((response) => response.json())
-      .then((data) => console.log(data));
+  useEffect(() => {
+    fetch("http://localhost:5000/api/discussion/get_all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setDiscussions(data.discussions); 
+      })
+      .catch((error) => {
+        console.error("Error fetching discussions:", error);
+      });
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevents page refresh
+    console.log("Search started with query:", searchQuery); 
+    if (searchQuery.trim()) {
+      fetch(`http://localhost:5000/api/discussion/search?theme_name=${searchQuery}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Search Results:", data);
+          setDiscussions(data); // Sets discussions to the search results
+        })
+        .catch((error) => {
+          console.error("Error fetching search results:", error);
+        });
+    } else {
+      console.log("Search query is empty");
+      fetch("http://localhost:5000/api/discussion/get_all")
+        .then((response) => response.json())
+        .then((data) => setDiscussions(data.discussions))
+        .catch((error) => console.error("Error fetching discussions:", error));
+    }
+  };
+  
+
+  
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);  
+    }
   };
 
   const handleLogout = () => {
@@ -108,12 +209,12 @@ const Home: React.FC = () => {
         <div className="navbar-center">
           <div className="search-container">
             <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onBlur={handleSearch}
-              className="search-input"
+               type="text"
+               placeholder="Search..."
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+               onKeyDown={handleSearchKeyPress}  
+               className="search-input"
             />
             <img src="/search.png" alt="Search Icon" className="search-icon" />
           </div>
@@ -134,22 +235,18 @@ const Home: React.FC = () => {
           </div>
         </div>
       </nav>
-
-      {/* Sekcija za diskusije */}
+    <div className="discussion-space">
+      {/* Discussions Section */}
       <div className="discussions-section">
-        <Discussion
-          title="React vs Angular"
-          content="Which one do you prefer and why?"
-          text="Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
-          author="John Doe"
-        />
-        <Discussion
-          title="Best practices for REST APIs"
-          content="Share your favorite tips for designing RESTful APIs."
-          author="Jane Smith"
-          text="Jskjdksjdknsnsjkfdsfjkdsssssssssssssjfkjdhfkjdhsjkfhdsjkhfjdskhfjdshfjbdskcbkjsabkjbvjksavbjksbajvbjsabvkasbvkjbsjkvbjskvbjksabvjkawjewqijwjroiewjifodkvndmbv"
-        />
+        {discussions.length > 0 ? (
+          discussions.map((discussion) => (
+            <Discussion key={discussion.id} {...discussion} />
+          ))
+        ) : (
+          <p>No discussions available</p>
+        )}
       </div>
+    </div>
     </div>
   );
 };
