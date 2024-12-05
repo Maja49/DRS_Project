@@ -30,6 +30,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] = useState<boolean>(false);
+  
 
   const handleLike = () => {
     if (!hasLiked) {
@@ -132,17 +133,37 @@ const Discussion: React.FC<DiscussionProps> = ({
             ))}
           </div>
         </div>
+        
     </div>
   );
 };
 
 const Home: React.FC = () => {
   const username = localStorage.getItem("user_id") || "Guest";
+
   const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+  const [isAddPostModalVisible, setIsAddPostModalVisible] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostText, setNewPostText] = useState("");
+  const [newPostTheme, setNewPostTheme] = useState("");
+  const [themes, setThemes] = useState<{ id: number; name: string }[]>([]); 
 
   useEffect(() => {
+    // Učitavamo sve teme sa servera
+    fetch("http://localhost:5000/api/discussion/themes")
+      .then((response) => response.json())
+      .then((data) => setThemes(data))  // Postavljamo teme u state
+      .catch((error) => console.error("Error fetching themes:", error));
+
+    fetch("http://localhost:5000/api/discussion/get_all")
+      .then((response) => response.json())
+      .then((data) => setDiscussions(data.discussions))
+      .catch((error) => console.error("Error fetching discussions:", error));
+  }, []);
+
+  /*useEffect(() => {
     fetch("http://localhost:5000/api/discussion/get_all")
       .then((response) => {
         if (!response.ok) {
@@ -158,7 +179,7 @@ const Home: React.FC = () => {
         console.error("Error fetching discussions:", error);
       });
   }, []);
-
+*/
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault(); // Prevents page refresh
     console.log("Search started with query:", searchQuery); 
@@ -199,6 +220,49 @@ const Home: React.FC = () => {
     window.location.href = "/Login"; // Redirect to login page
   };
 
+  const handleAddPost = () => {
+    console.log();
+    setIsAddPostModalVisible(true);
+  };
+  
+  const handleSavePost = () => {
+    if (newPostText.trim() && newPostTheme.trim()) {
+      const newDiscussion = {
+        title: newPostTitle,  
+        text: newPostText,    
+        theme_name: newPostTheme,
+      };
+
+      const userToken = localStorage.getItem("userToken"); 
+
+      if (!userToken) {
+        console.error("User token is not available!");
+        return;
+      }
+
+      fetch("http://localhost:5000/api/discussion/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`, 
+        },
+        body: JSON.stringify(newDiscussion),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("New discussion added:", data);
+          setDiscussions([data.discussion, ...discussions]);
+          setIsAddPostModalVisible(false);
+          setNewPostTitle("");
+          setNewPostText("");
+          setNewPostTheme(""); // Resetovanje teme
+        })
+        .catch((error) => console.error("Error adding discussion:", error));
+    } else {
+      alert("Please fill in all fields!");
+    }
+};
+  
   return (
     <div>
       <nav className="navbar">
@@ -220,6 +284,9 @@ const Home: React.FC = () => {
           </div>
         </div>
         <div className="navbar-right">
+          <button className="add-post-button" onClick={handleAddPost}  >
+                Add post +
+          </button>
           <div
             className="profile-section"
             onClick={() => setDropdownVisible(!dropdownVisible)}
@@ -232,6 +299,42 @@ const Home: React.FC = () => {
               </button>
               <button onClick={handleLogout}>Logout</button>
             </div>
+            {isAddPostModalVisible && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <h2>Add New Discussion</h2>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={newPostTitle}
+                  onChange={(e) => setNewPostTitle(e.target.value)}
+                  className="modal-input"
+                />
+                <textarea
+                  placeholder="Text"
+                  value={newPostText}
+                  onChange={(e) => setNewPostText(e.target.value)}
+                  className="modal-textarea"
+                />
+                <select
+                  value={newPostTheme}
+                  onChange={(e) => setNewPostTheme(e.target.value)}
+                  className="modal-select"
+                >
+                  <option value="">Select Theme</option>
+                  {themes.map((theme) => (
+                    <option key={theme.id} value={theme.name}>
+                      {theme.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="modal-actions">
+                  <button onClick={handleSavePost}>Save</button>
+                  <button onClick={() => setIsAddPostModalVisible(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+            )}
           </div>
         </div>
       </nav>

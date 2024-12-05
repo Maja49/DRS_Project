@@ -77,10 +77,11 @@ def create_discussion():
 
     data = request.get_json()
     text = data.get('text')
+    title = data.get('title')
     theme_name = data.get('theme_name')  # Naziv teme iz padajućeg menija
 
-    if not text or not theme_name:
-        return jsonify({"message": "Text and theme_name are required"}), 400
+    if not text or not theme_name or not title:
+        return jsonify({"message": "Text, title and theme_name are required"}), 400
 
     # Pronalazak teme prema imenu
     theme = Theme.query.filter_by(name=theme_name).first()
@@ -91,6 +92,7 @@ def create_discussion():
     # Kreiranje diskusije sa automatskim postavljanjem vremena
     new_discussion = Discussion(
         text=text,
+        title=title,
         theme_id=theme.id,
         likes=0,
         dislikes=0,
@@ -107,6 +109,7 @@ def create_discussion():
             "discussion": {
                 "id": new_discussion.id,
                 "text": new_discussion.text,
+                "title": new_discussion.title,
                 "theme_name": theme.name,
                 "created_at": new_discussion.created_at,
                 "updated_at": new_discussion.updated_at
