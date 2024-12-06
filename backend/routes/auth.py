@@ -21,7 +21,7 @@ def register():
     email = request.json.get('email')
     password = request.json.get('password')
     username = request.json.get('username')
-    is_admin = request.json.get('is_admin', False),
+    is_admin = request.json.get('is_admin', False)
     is_approved = request.json.get('is_approved', False)
 
     # Provera da li već postoji korisnik
@@ -117,42 +117,3 @@ def update_account():
         return jsonify({"message": "Error updating account", "error": str(e)}), 500
 # endregion
 
-
-# region preuzimanje svih korisnika
-# Ruta za preuzimanje svih korisnika
-@auth_bp.route('/users', methods=['GET'])
-def get_all_users():
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({"message": "Token is missing"}), 403
-
-    # Validacija tokena
-    decoded = decode_token(token.split()[1])
-    if "error" in decoded:
-        return jsonify({"message": decoded["error"]}), 403
-
-    # Provera administratorskog pristupa
-    is_admin = decoded.get("is_admin")
-    if not is_admin:
-        return jsonify({"message": "Unauthorized: Admin privileges required"}), 403
-
-    # Preuzimanje svih korisnika iz baze
-    users = User.query.all()
-    users_list = [
-        {
-            "id": user.id,
-            "name": user.name,
-            "lastname": user.lastname,
-            "adress": user.adress,
-            "city": user.city,
-            "country": user.country,
-            "phone_number": user.phone_number,
-            "email": user.email,
-            "username": user.username,
-            "is_admin": user.is_admin,
-        }
-        for user in users
-    ]
-
-    return jsonify({"users": users_list}), 200
-# endregion

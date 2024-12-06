@@ -75,3 +75,43 @@ def reject_registration_request(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Error rejecting registration", "error": str(e)}), 500
+
+
+# region preuzimanje svih korisnika
+# Ruta za preuzimanje svih korisnika
+@admin_bp.route('/users', methods=['GET'])
+def get_all_users():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"message": "Token is missing"}), 403
+
+    # Validacija tokena
+    decoded = decode_token(token.split()[1])
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    # Provera administratorskog pristupa
+    is_admin = decoded.get("is_admin")
+    if not is_admin:
+        return jsonify({"message": "Unauthorized: Admin privileges required"}), 403
+
+    # Preuzimanje svih korisnika iz baze
+    users = User.query.filter_by(is_approved=True, is_admin=False).all()
+    users_list = [
+        {
+            "id": user.id,
+            "name": user.name,
+            "lastname": user.lastname,
+            "adress": user.adress,
+            "city": user.city,
+            "country": user.country,
+            "phone_number": user.phone_number,
+            "email": user.email,
+            "username": user.username,
+            "is_admin": user.is_admin,
+        }
+        for user in users
+    ]
+
+    return jsonify({"users": users_list}), 200
+# endregion

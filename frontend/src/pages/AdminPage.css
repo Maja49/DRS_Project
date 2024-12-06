@@ -1,7 +1,7 @@
 .admin-page {
   padding: 20px;
   font-family: Arial, sans-serif;
-  max-width: 1000px; /* Širina stranice veća kako bi stalo više sadržaja */
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -21,12 +21,68 @@ h1 {
   margin-bottom: 20px;
 }
 
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 100px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+  height: 50px; /* Fiksiraj visinu tabova */
+}
+
+.tabs button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.tabs button:hover {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+.tabs button:focus {
+  outline: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff; /* Ovdje se postavlja pozadina tabele */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden; /* Da ivice ne budu oštre */
+}
+
+table th,
+table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+table tr:hover {
+  background-color: #f9f9f9;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
   display: flex;
-  flex-wrap: wrap; /* Omogućava prelamanje u više redova ako nema dovoljno prostora */
-  gap: 20px; /* Razmak između stavki */
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .request-item {
@@ -35,12 +91,12 @@ ul {
   border-radius: 8px;
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: calc(33.33% - 20px); /* Širina svakog elementa u kolonama (3 kolone) */
+  width: calc(33.33% - 20px);
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
-  min-width: 300px; /* Osigurava minimalnu širinu za svaki "request-item" */
-  box-sizing: border-box; /* Uključuje padding u ukupnu širinu */
+  min-width: 300px;
+  box-sizing: border-box;
 }
 
 .request-item p {
@@ -54,7 +110,7 @@ ul {
 
 .action-buttons {
   display: flex;
-  justify-content: space-between; /* Postavljanje dugmadi sa razmakom između */
+  justify-content: space-between;
   gap: 10px;
   margin-top: 15px;
 }
@@ -67,7 +123,7 @@ ul {
   font-size: 0.9rem;
   border-radius: 5px;
   transition: all 0.3s ease;
-  width: 48%; /* Svako dugme će zauzeti 48% širine roditeljskog elementa */
+  width: 48%;
 }
 
 .accept-button {
@@ -91,6 +147,12 @@ ul {
 }
 
 .no-requests {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.no-users {
   text-align: center;
   font-size: 1.2rem;
   color: #777;

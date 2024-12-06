@@ -12,8 +12,19 @@ interface RegistrationRequest {
   reject_url: string;
 }
 
+interface User {
+  id: number;
+  name: string;
+  lastname: string;
+  email: string;
+  username: string;
+  is_admin: boolean;
+}
+
 const AdminPage: React.FC = () => {
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("requests");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Dohvatanje zahtjeva za registraciju
@@ -41,6 +52,30 @@ const AdminPage: React.FC = () => {
         setErrorMessage("Error fetching registration requests.");
       }
       console.error(error);
+    }
+  };
+
+  // Dohvatanje svih korisnika koji nisu admini
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      setErrorMessage("Unauthorized: No token found.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/admin/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUsers(response.data.users); // Server već filtrira korisnike koji nisu admini
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setErrorMessage("Error fetching users.");
     }
   };
 
@@ -80,7 +115,6 @@ const AdminPage: React.FC = () => {
     }
 
     try {
-      // Pravilno pozivanje DELETE rute sa tačnim URL-om
       await axios.delete(
         `http://localhost:5000/api/admin/registration-requests/reject/${userId}`,
         {
@@ -100,6 +134,7 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     fetchRegistrationRequests();
+    fetchUsers();
   }, []);
 
   const username = localStorage.getItem("user_id") || "Guest";
@@ -116,6 +151,8 @@ const AdminPage: React.FC = () => {
     localStorage.clear();
     window.location.href = "/Login"; // Redirect to login page
   };
+
+  ////teme:
 
   return (
     <div>
@@ -155,39 +192,87 @@ const AdminPage: React.FC = () => {
       </nav>
 
       <div className="admin-page">
+        <div className="tabs">
+          <button
+            className={activeTab === "requests" ? "active" : ""}
+            onClick={() => setActiveTab("requests")}
+          >
+            Registration Requests
+          </button>
+          <button
+            className={activeTab === "users" ? "active" : ""}
+            onClick={() => setActiveTab("users")}
+          >
+            Approved Users
+          </button>
+        </div>
+
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-        {!errorMessage && requests.length === 0 && (
-          <p className="no-requests">No pending registration requests.</p>
+
+        {activeTab === "requests" && (
+          <>
+            {!errorMessage && requests.length === 0 && (
+              <p className="no-requests">No pending registration requests.</p>
+            )}
+            <ul>
+              {requests.map((req) => (
+                <li key={req.id} className="request-item">
+                  <p>
+                    <strong>Name:</strong> {req.name} {req.lastname}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {req.email}
+                  </p>
+                  <p>
+                    <strong>Username:</strong> {req.username}
+                  </p>
+                  <div className="action-buttons">
+                    <button
+                      className="accept-button"
+                      onClick={() => handleAccept(req.id)}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      className="reject-button"
+                      onClick={() => handleReject(req.id)}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
-        <ul>
-          {requests.map((req) => (
-            <li key={req.id} className="request-item">
-              <p>
-                <strong>Name:</strong> {req.name} {req.lastname}
-              </p>
-              <p>
-                <strong>Email:</strong> {req.email}
-              </p>
-              <p>
-                <strong>Username:</strong> {req.username}
-              </p>
-              <div className="action-buttons">
-                <button
-                  className="accept-button"
-                  onClick={() => handleAccept(req.id)}
-                >
-                  Accept
-                </button>
-                <button
-                  className="reject-button"
-                  onClick={() => handleReject(req.id)}
-                >
-                  Reject
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+
+        {activeTab === "users" && (
+          <>
+            {!errorMessage && users.length === 0 && (
+              <p className="no-users">No approved users found.</p>
+            )}
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Username</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      {user.name} {user.lastname}
+                    </td>
+                    <td>{user.email}</td>
+                    <td>{user.username}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
     </div>
   );
