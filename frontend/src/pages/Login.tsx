@@ -7,6 +7,7 @@ import "./Login.css";
 interface DecodedToken {
   user_id: string;
   is_admin: boolean;
+  is_approved: boolean;
   username: string;
 }
 
@@ -44,14 +45,31 @@ const Login: React.FC = () => {
         const decoded = jwtDecode<DecodedToken>(data.token);
         localStorage.setItem("user_id", decoded.user_id);
         localStorage.setItem("is_admin", decoded.is_admin ? "true" : "false");
+        localStorage.setItem(
+          "is_approved",
+          decoded.is_approved ? "true" : "false"
+        );
         localStorage.setItem("username", decoded.username);
 
-        // Preusmeravanje na odgovarajuću stranicu
-        if (decoded.is_admin) {
+        if (!decoded.is_approved && !decoded.is_admin) {
+          setErrorMessage(
+            "Your account is not approved yet. Please contact admin."
+          );
+          return;
+        } else if (decoded.is_approved && !decoded.is_admin) {
+          window.location.href = "/home";
+        } else if (!decoded.is_approved && decoded.is_admin) {
           window.location.href = "/admin";
         } else {
-          window.location.href = "/home";
+          window.location.href = "/admin";
         }
+
+        // Preusmeravanje na odgovarajuću stranicu
+        // if (decoded.is_admin) {
+        //   window.location.href = "/admin";
+        // } else {
+        //   window.location.href = "/home";
+        // }
       } else {
         setErrorMessage(data.message || "Login failed");
       }

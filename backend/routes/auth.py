@@ -21,7 +21,8 @@ def register():
     email = request.json.get('email')
     password = request.json.get('password')
     username = request.json.get('username')
-    is_admin = request.json.get('is_admin', False)
+    is_admin = request.json.get('is_admin', False),
+    is_approved = request.json.get('is_approved', False)
 
     # Provera da li već postoji korisnik
     if User.query.filter_by(username=username).first():
@@ -40,7 +41,8 @@ def register():
         email=email,
         password=password,
         username=username,
-        is_admin=is_admin
+        is_admin=is_admin,
+        is_approved=is_approved,
     )
 
     # Dodavanje korisnika u bazu
@@ -63,7 +65,7 @@ def login():
 
     if user and user.password == password:
         # Generišemo token
-        token = generate_token(user_id=user.id, is_admin=user.is_admin)
+        token = generate_token(user_id=user.id, is_admin=user.is_admin, is_approved=user.is_approved)
         return jsonify({"message": "Login successful", "token": token}), 200
     else:
         return jsonify({"message": "Invalid email or password"}), 401
