@@ -5,11 +5,15 @@
   margin: 0 auto;
 }
 
-h1 {
+h1,
+h2 {
   text-align: center;
-  margin-bottom: 30px;
   font-size: 2rem;
   color: #333;
+}
+
+h2 {
+  margin-bottom: 20px;
 }
 
 .error-message {
@@ -21,13 +25,66 @@ h1 {
   margin-bottom: 20px;
 }
 
+.success-message {
+  color: green;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.add-theme-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  height: 100px;
+}
+
+button.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button.submit-button:hover {
+  background-color: #45a049;
+}
+
 .tabs {
   display: flex;
   justify-content: flex-start;
   margin-top: 100px;
   margin-bottom: 20px;
   border-bottom: 2px solid #ddd;
-  height: 50px; /* Fiksiraj visinu tabova */
+  height: 50px;
 }
 
 .tabs button {
@@ -54,10 +111,10 @@ h1 {
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff; /* Ovdje se postavlja pozadina tabele */
+  background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  overflow: hidden; /* Da ivice ne budu oštre */
+  overflow: hidden;
 }
 
 table th,
@@ -116,7 +173,8 @@ ul {
 }
 
 .accept-button,
-.reject-button {
+.reject-button,
+.add-theme-button {
   border: none;
   padding: 10px 20px;
   cursor: pointer;
@@ -124,6 +182,12 @@ ul {
   border-radius: 5px;
   transition: all 0.3s ease;
   width: 48%;
+}
+
+.add-theme-button {
+  background-color: #4caf50;
+  color: white;
+  margin-bottom: 14px;
 }
 
 .accept-button {
@@ -146,14 +210,29 @@ ul {
   box-shadow: 0 2px 5px rgba(255, 0, 0, 0.2);
 }
 
-.no-requests {
+.no-requests,
+.no-users {
   text-align: center;
   font-size: 1.2rem;
   color: #777;
 }
 
-.no-users {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #777;
+.delete-button {
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #e53935;
+  transform: translateY(-2px);
+}
+
+.delete-button:active {
+  transform: translateY(1px);
 }

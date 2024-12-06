@@ -21,11 +21,22 @@ interface User {
   is_admin: boolean;
 }
 
+interface Theme {
+  id: number;
+  name: string;
+  description: string;
+}
+
 const AdminPage: React.FC = () => {
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [themes, setThemes] = useState<Theme[]>([]);
   const [activeTab, setActiveTab] = useState<string>("requests");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   // Dohvatanje zahtjeva za registraciju
   const fetchRegistrationRequests = async () => {
@@ -135,11 +146,11 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     fetchRegistrationRequests();
     fetchUsers();
+    fetchThemes(); // Dohvatanje tema
   }, []);
 
   const username = localStorage.getItem("user_id") || "Guest";
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
   const handleSearch = () => {
     fetch(`/api/discussions/search?query=${searchQuery}`)
@@ -152,7 +163,96 @@ const AdminPage: React.FC = () => {
     window.location.href = "/Login"; // Redirect to login page
   };
 
-  ////teme:
+  ////////teme///////////
+  // Dohvatanje svih tema
+  const fetchThemes = async () => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      setErrorMessage("Unauthorized: No token found.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/admin/theme-list",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setThemes(response.data);
+    } catch (error) {
+      console.error("Error fetching themes:", error);
+      setErrorMessage("Error fetching themes.");
+    }
+  };
+
+  // Funkcija za slanje POST zahteva za kreiranje nove teme
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      setErrorMessage("Unauthorized: No token found.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/theme-create", // URL za dodavanje nove teme
+        {
+          name: name,
+          description: description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setSuccessMessage(response.data.message);
+      setName(""); // Resetovanje stanja za ime
+      setDescription(""); // Resetovanje stanja za opis
+      fetchThemes(); // Osvežavanje liste tema
+    } catch (error: any) {
+      if (error.response) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("Error creating theme.");
+      }
+    }
+  };
+
+  const handleDelete = async (themeId: number) => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      setErrorMessage("Unauthorized: No token found.");
+      return;
+    }
+
+    try {
+      console.log(themeId);
+      const response = await axios.delete(
+        `http://localhost:5000/api/admin/theme-delete/${themeId}`, // API endpoint za brisanje teme
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Uklanjanje teme iz liste nakon uspešnog brisanja
+      setThemes((prevThemes) =>
+        prevThemes.filter((theme) => theme.id !== themeId)
+      );
+      setSuccessMessage(response.data.message); // Prikazivanje poruke o uspehu
+    } catch (error) {
+      console.error("Error deleting theme:", error);
+      setErrorMessage("Error deleting theme.");
+    }
+  };
 
   return (
     <div>
@@ -205,9 +305,80 @@ const AdminPage: React.FC = () => {
           >
             Approved Users
           </button>
+          <button
+            className={activeTab === "themes" ? "active" : ""}
+            onClick={() => setActiveTab("themes")}
+          >
+            Themes
+          </button>
         </div>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+        {activeTab === "themes" && (
+          <>
+            <button
+              className="add-theme-button"
+              onClick={() => setActiveTab("add-theme")}
+            >
+              Add New Theme
+            </button>
+
+            {!errorMessage && themes.length === 0 && (
+              <p className="no-themes">No themes available.</p>
+            )}
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {themes.map((theme) => (
+                  <tr key={theme.id}>
+                    <td>{theme.name}</td>
+                    <td>{theme.description}</td>
+                    <td>
+                      <button
+                        onClick={() => handleDelete(theme.id)}
+                        className="delete-button"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {/* Forma za dodavanje nove teme */}
+        {activeTab === "add-theme" && (
+          <form onSubmit={handleSubmit}>
+            <h3>Add New Theme</h3>
+            <div className="form-group">
+              <label>Name:</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Description:</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit">Create Theme</button>
+          </form>
+        )}
 
         {activeTab === "requests" && (
           <>

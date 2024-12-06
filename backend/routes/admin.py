@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import db
+from models.theme import Theme
 from models.user import User
 from utils.token_utils import decode_token
 
@@ -115,3 +116,80 @@ def get_all_users():
 
     return jsonify({"users": users_list}), 200
 # endregion
+
+# Lista svih tema
+@admin_bp.route('/theme-list', methods=['GET'])
+def list_themes():
+    themes = Theme.query.all()
+    return jsonify([
+        {
+            'id': theme.id,
+            'name': theme.name,
+            'description': theme.description
+        }
+        for theme in themes
+    ])
+    
+    # Dodavanje nove teme
+@admin_bp.route('/theme-create', methods=['POST'])
+def create_theme():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"message": "Token is missing"}), 403
+
+    decoded = decode_token(token.split()[1])
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    if not decoded.get('is_admin'):
+        return jsonify({"message": "Unauthorized. Only admins can create themes."}), 403
+
+    data = request.json
+    name = data.get('name')
+    description = data.get('description')
+
+    if not name:
+        return jsonify({'message': 'Theme name is required.'}), 400
+
+    if Theme.query.filter_by(name=name).first():
+        return jsonify({'message': 'Theme with this name already exists.'}), 409
+
+    new_theme = Theme(name=name, description=description)
+    db.session.add(new_theme)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Theme successfully created.',
+        'theme': {
+            'id': new_theme.id,
+            'name': new_theme.name,
+            'description': new_theme.description
+        }
+    }), 201
+
+
+# Brisanje teme
+@admin_bp.route('/theme-delete/<int:theme_id>', methods=['DELETE'])
+def delete_theme(theme_id):
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"message": "Token is missing"}), 403
+
+    decoded = decode_token(token.split()[1])
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    if not decoded.get('is_admin'):
+        return jsonify({"message": "Unauthorized. Only admins can delete themes."}), 403
+
+    theme = Theme.query.get(theme_id)
+    if not theme:
+        return jsonify({"message": "Theme not found"}), 404
+
+    try:
+        db.session.delete(theme)
+        db.session.commit()
+        return jsonify({"message": "Theme deleted successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
