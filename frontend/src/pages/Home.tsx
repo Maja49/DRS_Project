@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { formatDistanceToNow } from "date-fns";
+// import { formatDistanceToNow } from "date-fns";
 import "./Home.css";
 
 interface DiscussionProps {
@@ -14,7 +14,7 @@ interface DiscussionProps {
 }
 
 const Discussion: React.FC<DiscussionProps> = ({
-  id,
+  // id,
   text,
   title,
   theme_name,
@@ -29,8 +29,8 @@ const Discussion: React.FC<DiscussionProps> = ({
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState<string>("");
-  const [isCommentSectionVisible, setIsCommentSectionVisible] = useState<boolean>(false);
-  
+  const [isCommentSectionVisible, setIsCommentSectionVisible] =
+    useState<boolean>(false);
 
   const handleLike = () => {
     if (!hasLiked) {
@@ -75,14 +75,16 @@ const Discussion: React.FC<DiscussionProps> = ({
     setNewComment(""); // Clears the input field
   };
 
- /* const formattedTime = formatDistanceToNow(new Date(created_at), { addSuffix: true });*/
+  /* const formattedTime = formatDistanceToNow(new Date(created_at), { addSuffix: true });*/
 
   return (
     <div className="discussion-card">
       <div className="discussion-header">
         <p className="topic">{theme_name}</p>
         <p className="discussion-created">{created_at}</p>
-        {updated_at && <p className="discussion-updated">Updated At: {updated_at}</p>}
+        {updated_at && (
+          <p className="discussion-updated">Updated At: {updated_at}</p>
+        )}
       </div>
       <p className="discussion-title">{title}</p>
       <div className="discussion-text">{text}</div>
@@ -99,41 +101,43 @@ const Discussion: React.FC<DiscussionProps> = ({
         >
           💔 {dislikes}
         </button>
-        <button 
-            className="comment-button" 
-            onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-          >
-            💬
-          </button>
-          </div>
+        <button
+          className="comment-button"
+          onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+        >
+          💬
+        </button>
+      </div>
 
-        <div className="comment-section">
-          
-          {isCommentSectionVisible && (
-            <div className="comment-input-container">
-              <input
-                type="text"
-                placeholder={newComment === "" ? "Add Comment..." : ""}
-                value={newComment}
-                onChange={handleCommentChange}
-                onFocus={() => {}}
-              />
-              <div className="comment-buttons">
-                <button className="cancel-button" onClick={handleCancelComment}>Cancel</button>
-                <button className="add-comment-button" onClick={handleAddComment}>Comment</button>
-              </div>
+      <div className="comment-section">
+        {isCommentSectionVisible && (
+          <div className="comment-input-container">
+            <input
+              type="text"
+              placeholder={newComment === "" ? "Add Comment..." : ""}
+              value={newComment}
+              onChange={handleCommentChange}
+              onFocus={() => {}}
+            />
+            <div className="comment-buttons">
+              <button className="cancel-button" onClick={handleCancelComment}>
+                Cancel
+              </button>
+              <button className="add-comment-button" onClick={handleAddComment}>
+                Comment
+              </button>
             </div>
-          )}
-
-          <div className="comments-list">
-            {comments.map((comment, index) => (
-              <div key={index} className="comment">
-                {comment}
-              </div>
-            ))}
           </div>
+        )}
+
+        <div className="comments-list">
+          {comments.map((comment, index) => (
+            <div key={index} className="comment">
+              {comment}
+            </div>
+          ))}
         </div>
-        
+      </div>
     </div>
   );
 };
@@ -148,13 +152,13 @@ const Home: React.FC = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostText, setNewPostText] = useState("");
   const [newPostTheme, setNewPostTheme] = useState("");
-  const [themes, setThemes] = useState<{ id: number; name: string }[]>([]); 
+  const [themes, setThemes] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
     // Učitavamo sve teme sa servera
     fetch("http://localhost:5000/api/discussion/themes")
       .then((response) => response.json())
-      .then((data) => setThemes(data))  // Postavljamo teme u state
+      .then((data) => setThemes(data)) // Postavljamo teme u state
       .catch((error) => console.error("Error fetching themes:", error));
 
     fetch("http://localhost:5000/api/discussion/get_all")
@@ -182,9 +186,11 @@ const Home: React.FC = () => {
 */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault(); // Prevents page refresh
-    console.log("Search started with query:", searchQuery); 
+    console.log("Search started with query:", searchQuery);
     if (searchQuery.trim()) {
-      fetch(`http://localhost:5000/api/discussion/search?theme_name=${searchQuery}`)
+      fetch(
+        `http://localhost:5000/api/discussion/search?theme_name=${searchQuery}`
+      )
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -206,12 +212,10 @@ const Home: React.FC = () => {
         .catch((error) => console.error("Error fetching discussions:", error));
     }
   };
-  
 
-  
   const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch(e);  
+    if (e.key === "Enter") {
+      handleSearch(e);
     }
   };
 
@@ -224,16 +228,16 @@ const Home: React.FC = () => {
     console.log();
     setIsAddPostModalVisible(true);
   };
-  
+
   const handleSavePost = () => {
     if (newPostText.trim() && newPostTheme.trim()) {
       const newDiscussion = {
-        title: newPostTitle,  
-        text: newPostText,    
+        title: newPostTitle,
+        text: newPostText,
         theme_name: newPostTheme,
       };
 
-      const userToken = localStorage.getItem("userToken"); 
+      const userToken = localStorage.getItem("userToken");
 
       if (!userToken) {
         console.error("User token is not available!");
@@ -244,7 +248,7 @@ const Home: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`, 
+          Authorization: `Bearer ${userToken}`,
         },
         body: JSON.stringify(newDiscussion),
       })
@@ -261,8 +265,8 @@ const Home: React.FC = () => {
     } else {
       alert("Please fill in all fields!");
     }
-};
-  
+  };
+
   return (
     <div>
       <nav className="navbar">
@@ -273,19 +277,19 @@ const Home: React.FC = () => {
         <div className="navbar-center">
           <div className="search-container">
             <input
-               type="text"
-               placeholder="Search..."
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-               onKeyDown={handleSearchKeyPress}  
-               className="search-input"
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyPress}
+              className="search-input"
             />
             <img src="/search.png" alt="Search Icon" className="search-icon" />
           </div>
         </div>
         <div className="navbar-right">
-          <button className="add-post-button" onClick={handleAddPost}  >
-                Add post +
+          <button className="add-post-button" onClick={handleAddPost}>
+            Add post +
           </button>
           <div
             className="profile-section"
@@ -300,56 +304,58 @@ const Home: React.FC = () => {
               <button onClick={handleLogout}>Logout</button>
             </div>
             {isAddPostModalVisible && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h2>Add New Discussion</h2>
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={newPostTitle}
-                  onChange={(e) => setNewPostTitle(e.target.value)}
-                  className="modal-input"
-                />
-                <textarea
-                  placeholder="Text"
-                  value={newPostText}
-                  onChange={(e) => setNewPostText(e.target.value)}
-                  className="modal-textarea"
-                />
-                <select
-                  value={newPostTheme}
-                  onChange={(e) => setNewPostTheme(e.target.value)}
-                  className="modal-select"
-                >
-                  <option value="">Select Theme</option>
-                  {themes.map((theme) => (
-                    <option key={theme.id} value={theme.name}>
-                      {theme.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="modal-actions">
-                  <button onClick={handleSavePost}>Save</button>
-                  <button onClick={() => setIsAddPostModalVisible(false)}>Cancel</button>
+              <div className="modal-overlay">
+                <div className="modal">
+                  <h2>Add New Discussion</h2>
+                  <input
+                    type="text"
+                    placeholder="Title"
+                    value={newPostTitle}
+                    onChange={(e) => setNewPostTitle(e.target.value)}
+                    className="modal-input"
+                  />
+                  <textarea
+                    placeholder="Text"
+                    value={newPostText}
+                    onChange={(e) => setNewPostText(e.target.value)}
+                    className="modal-textarea"
+                  />
+                  <select
+                    value={newPostTheme}
+                    onChange={(e) => setNewPostTheme(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="">Select Theme</option>
+                    {themes.map((theme) => (
+                      <option key={theme.id} value={theme.name}>
+                        {theme.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="modal-actions">
+                    <button onClick={handleSavePost}>Save</button>
+                    <button onClick={() => setIsAddPostModalVisible(false)}>
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
             )}
           </div>
         </div>
       </nav>
-    <div className="discussion-space">
-      {/* Discussions Section */}
-      <div className="discussions-section">
-        {discussions.length > 0 ? (
-          discussions.map((discussion) => (
-            <Discussion key={discussion.id} {...discussion} />
-          ))
-        ) : (
-          <p>No discussions available</p>
-        )}
+      <div className="discussion-space">
+        {/* Discussions Section */}
+        <div className="discussions-section">
+          {discussions.length > 0 ? (
+            discussions.map((discussion) => (
+              <Discussion key={discussion.id} {...discussion} />
+            ))
+          ) : (
+            <p>No discussions available</p>
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 };

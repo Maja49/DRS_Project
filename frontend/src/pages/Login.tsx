@@ -39,7 +39,7 @@ const Login: React.FC = () => {
 
       if (data.token) {
         // Spremanje tokena u localStorage
-        localStorage.setItem("userToken", data.token);
+        localStorage.setItem("auth_token", data.token);
 
         const decoded = jwtDecode<DecodedToken>(data.token);
         localStorage.setItem("user_id", decoded.user_id);
