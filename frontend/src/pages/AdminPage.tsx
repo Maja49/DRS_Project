@@ -28,6 +28,8 @@ interface Theme {
 }
 
 const AdminPage: React.FC = () => {
+  const username = getUsernameFromToken();
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -37,6 +39,21 @@ const AdminPage: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  function getUsernameFromToken(): string {
+    const token = localStorage.getItem("auth_token"); // JWT token iz localStorage
+    if (token) {
+      try {
+        const payloadBase64 = token.split(".")[1];
+        const decodedPayload = JSON.parse(atob(payloadBase64)); // Dekodiramo payload
+        return decodedPayload.username || "Guest"; // Vraćamo korisničko ime ili "Guest" ako nije dostupno
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return "Guest"; // Ako nešto pođe po zlu, vraćamo "Guest"
+      }
+    }
+    return "Guest"; // Ako token ne postoji
+  }
 
   // Dohvatanje zahtjeva za registraciju
   const fetchRegistrationRequests = async () => {
@@ -148,9 +165,6 @@ const AdminPage: React.FC = () => {
     fetchUsers();
     fetchThemes(); // Dohvatanje tema
   }, []);
-
-  const username = localStorage.getItem("user_id") || "Guest";
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleSearch = () => {
     fetch(`/api/discussions/search?query=${searchQuery}`)
