@@ -5,10 +5,11 @@ from datetime import datetime, timedelta, timezone
 SECRET_KEY = "a#4h!r3d89D09$2faHf!sd83F@#s"
 
 # Funkcija za generisanje tokena
-def generate_token(user_id, is_admin, is_approved):
+def generate_token(user_id, is_admin, username, is_approved):
     payload = {
         "user_id": user_id,
         "is_admin": is_admin,
+        "username": username,
         "is_approved": is_approved,
         "exp": datetime.now(timezone.utc) + timedelta(hours=1)  # Token važi 1 sat
     }

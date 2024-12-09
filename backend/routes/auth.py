@@ -65,7 +65,7 @@ def login():
 
     if user and user.password == password:
         # Generišemo token
-        token = generate_token(user_id=user.id, is_admin=user.is_admin, is_approved=user.is_approved)
+        token = generate_token(user_id=user.id, is_admin=user.is_admin, username=user.username, is_approved=user.is_approved)
         return jsonify({"message": "Login successful", "token": token}), 200
     else:
         return jsonify({"message": "Invalid email or password"}), 401

@@ -141,7 +141,9 @@ const Discussion: React.FC<DiscussionProps> = ({
 };
 
 const Home: React.FC = () => {
-  const username = localStorage.getItem("user_id") || "Guest";
+  //const username = localStorage.getItem("user_id") || "Guest";
+  const username = getUsernameFromToken();
+
 
   const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -152,6 +154,22 @@ const Home: React.FC = () => {
   const [newPostTheme, setNewPostTheme] = useState("");
   const [themes, setThemes] = useState<{ id: number; name: string }[]>([]);
 
+  function getUsernameFromToken(): string {
+    const token = localStorage.getItem("auth_token"); // JWT token iz localStorage
+    if (token) {
+      try {
+        const payloadBase64 = token.split('.')[1];
+        const decodedPayload = JSON.parse(atob(payloadBase64)); // Dekodiramo payload
+        return decodedPayload.username || "Guest"; // Vraćamo korisničko ime ili "Guest" ako nije dostupno
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return "Guest"; // Ako nešto pođe po zlu, vraćamo "Guest"
+      }
+    }
+    return "Guest"; // Ako token ne postoji
+  }
+
+  
   useEffect(() => {
     // Učitavamo sve teme sa servera
     fetch("http://localhost:5000/api/discussion/themes")
@@ -359,5 +377,7 @@ const Home: React.FC = () => {
     </div>
   );
 };
+
+
 
 export default Home;
