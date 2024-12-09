@@ -237,7 +237,7 @@ const Home: React.FC = () => {
         theme_name: newPostTheme,
       };
 
-      const userToken = localStorage.getItem("userToken");
+      const userToken = localStorage.getItem("auth_token");
 
       if (!userToken) {
         console.error("User token is not available!");
