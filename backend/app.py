@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp, user_bp
 from models import db
 import config
 from flask_jwt_extended import JWTManager
@@ -38,6 +38,8 @@ app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
 # Registrovanje comment Blueprint-a
 app.register_blueprint(comment_bp, url_prefix='/api/comment')  
 
+# Registrovanje user Blueprint-a
+app.register_blueprint(user_bp, url_prefix='/api/user')  
 
 if __name__ == '__main__':
     with app.app_context():

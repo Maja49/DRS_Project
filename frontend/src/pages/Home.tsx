@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { formatDistanceToNow } from "date-fns";
 import "./Home.css";
 
 interface DiscussionProps {
@@ -14,7 +13,6 @@ interface DiscussionProps {
 }
 
 const Discussion: React.FC<DiscussionProps> = ({
-  // id,
   text,
   title,
   theme_name,
@@ -224,6 +222,10 @@ const Home: React.FC = () => {
     window.location.href = "/Login"; // Redirect to login page
   };
 
+  const handleEdit = () => {
+    window.location.href = "/user";
+  };
+
   const handleAddPost = () => {
     console.log();
     setIsAddPostModalVisible(true);
@@ -237,7 +239,7 @@ const Home: React.FC = () => {
         theme_name: newPostTheme,
       };
 
-      const userToken = localStorage.getItem("userToken");
+      const userToken = localStorage.getItem("auth_token");
 
       if (!userToken) {
         console.error("User token is not available!");
@@ -298,9 +300,7 @@ const Home: React.FC = () => {
             <img src="/profile.png" alt="Profile" className="profile-icon" />
             <span className="username">{username}</span>
             <div className={`dropdown-menu ${dropdownVisible ? "active" : ""}`}>
-              <button onClick={() => (window.location.href = "/user")}>
-                Edit Profile
-              </button>
+              <button onClick={handleEdit}>Edit Profile</button>
               <button onClick={handleLogout}>Logout</button>
             </div>
             {isAddPostModalVisible && (

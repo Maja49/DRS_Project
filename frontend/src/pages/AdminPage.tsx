@@ -163,6 +163,10 @@ const AdminPage: React.FC = () => {
     window.location.href = "/Login"; // Redirect to login page
   };
 
+  const handleEdit = () => {
+    window.location.href = "/user";
+  };
+
   ////////teme///////////
   // Dohvatanje svih tema
   const fetchThemes = async () => {
@@ -282,9 +286,7 @@ const AdminPage: React.FC = () => {
             <img src="/profile.png" alt="Profile" className="profile-icon" />
             <span className="username">{username}</span>
             <div className={`dropdown-menu ${dropdownVisible ? "active" : ""}`}>
-              <button onClick={() => (window.location.href = "/user")}>
-                Edit Profile
-              </button>
+              <button onClick={handleEdit}>Edit Profile</button>
               <button onClick={handleLogout}>Logout</button>
             </div>
           </div>

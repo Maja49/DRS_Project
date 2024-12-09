@@ -10,7 +10,6 @@ const User: React.FC = () => {
     city: "",
     country: "",
     phone: "",
-    email: "",
     password: "",
     username: "",
   });
@@ -23,9 +22,45 @@ const User: React.FC = () => {
     }));
   };
 
-  const handleSave = () => {
-    console.log("Updated User Data:", userData);
-    alert("Podaci su uspešno sačuvani!");
+  const handleSave = async () => {
+    const token = localStorage.getItem("auth_token"); // Pretpostavka: token je sačuvan u localStorage
+    if (!token) {
+      alert("Token nije pronađen. Prijavite se ponovo.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/user/update_account",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: userData.firstName,
+            lastname: userData.lastName,
+            adress: userData.address,
+            city: userData.city,
+            country: userData.country,
+            phone_number: userData.phone,
+            username: userData.username,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message); // Poruka o uspešnom ažuriranju
+      } else {
+        const error = await response.json();
+        alert(`Greška: ${error.message}`);
+      }
+    } catch (err) {
+      console.error("Greška prilikom slanja zahteva:", err);
+      alert("Došlo je do greške. Pokušajte ponovo.");
+    }
   };
 
   const handleBack = () => {
@@ -54,10 +89,6 @@ const User: React.FC = () => {
                 ? "Država"
                 : key === "phone"
                 ? "Broj telefona"
-                : key === "email"
-                ? "Email"
-                : key === "password"
-                ? "Lozinka"
                 : key === "username"
                 ? "Korisničko ime"
                 : key}
@@ -80,10 +111,6 @@ const User: React.FC = () => {
                   ? "državu"
                   : key === "phone"
                   ? "broj telefona"
-                  : key === "email"
-                  ? "email"
-                  : key === "password"
-                  ? "lozinku"
                   : key === "username"
                   ? "korisničko ime"
                   : key
