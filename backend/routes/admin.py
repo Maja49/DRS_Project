@@ -2,7 +2,9 @@ from flask import Blueprint, request, jsonify
 from models import db
 from models.theme import Theme
 from models.user import User
+from models.discussion import Discussion
 from utils.token_utils import decode_token
+import traceback
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -169,6 +171,7 @@ def create_theme():
 
 
 # Brisanje teme
+
 @admin_bp.route('/theme-delete/<int:theme_id>', methods=['DELETE'])
 def delete_theme(theme_id):
     token = request.headers.get('Authorization')
@@ -186,10 +189,17 @@ def delete_theme(theme_id):
     if not theme:
         return jsonify({"message": "Theme not found"}), 404
 
+    # Delete discussions related to the theme
     try:
+        discussions = Discussion.query.filter_by(theme_id=theme_id).all()
+        for discussion in discussions:
+            db.session.delete(discussion)
+
+        # Now delete the theme itself
         db.session.delete(theme)
         db.session.commit()
-        return jsonify({"message": "Theme deleted successfully."}), 200
+        return jsonify({"message": "Theme and associated discussions deleted successfully."}), 200
     except Exception as e:
         db.session.rollback()
+        print(f"Error deleting theme ID {theme_id}: {traceback.format_exc()}")
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
