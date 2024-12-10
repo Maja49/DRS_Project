@@ -17,7 +17,7 @@ discussion_bp = Blueprint('discussion', __name__)
 def get_all_discussions():
     try:
         # Query the database to get all discussions ordered by created_at from the oldest to the newest
-        discussions = Discussion.query.order_by(Discussion.created_at.asc()).all()
+        discussions = Discussion.query.order_by(Discussion.created_at.desc()).all()
 
         # Prepare the result data to return
         discussions_data = []
@@ -365,6 +365,8 @@ def search_discussions():
 
     # Izvršavanje upita
     discussions = query.all()
+    # Sortiranje
+    discussions = query.order_by(Discussion.created_at.desc()).all()
 
     # Formatiranje rezultata u JSON odgovor
     results = []
@@ -381,7 +383,9 @@ def search_discussions():
                 "email": User.query.get(discussion.user_id).email
             },
             "likes": discussion.likes,
-            "dislikes": discussion.dislikes
+            "dislikes": discussion.dislikes,
+            "created_at": discussion.created_at  #Da bi upisalo vreme kako treba 
+
         })
 
     return jsonify(results), 200

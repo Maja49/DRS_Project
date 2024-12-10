@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns"; // instalirajte ovo
 import "./Home.css";
 
 interface DiscussionProps {
@@ -73,13 +74,13 @@ const Discussion: React.FC<DiscussionProps> = ({
     setNewComment(""); // Clears the input field
   };
 
-  /* const formattedTime = formatDistanceToNow(new Date(created_at), { addSuffix: true });*/
+const formattedTime = created_at ? formatDistanceToNow(new Date(created_at), { addSuffix: true }) : "Invalid date";
 
   return (
     <div className="discussion-card">
       <div className="discussion-header">
         <p className="topic">{theme_name}</p>
-        <p className="discussion-created">{created_at}</p>
+        <p className="discussion-created">{formattedTime}</p>
         {updated_at && (
           <p className="discussion-updated">Updated At: {updated_at}</p>
         )}
@@ -186,7 +187,7 @@ const Home: React.FC = () => {
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        }'
         return response.json();
       })
       .then((data) => {
@@ -245,6 +246,7 @@ const Home: React.FC = () => {
   const handleAddPost = () => {
     console.log();
     setIsAddPostModalVisible(true);
+
   };
 
   const handleSavePost = () => {
@@ -313,33 +315,33 @@ const Home: React.FC = () => {
             className="profile-section"
             onClick={() => setDropdownVisible(!dropdownVisible)}
           >
-            <img src="/profile.png" alt="Profile" className="profile-icon" />
             <span className="username">{username}</span>
+            <img src="/profile.png" alt="Profile" className="profile-icon" />
             <div className={`dropdown-menu ${dropdownVisible ? "active" : ""}`}>
               <button onClick={handleEdit}>Edit Profile</button>
               <button onClick={handleLogout}>Logout</button>
             </div>
             {isAddPostModalVisible && (
-              <div className="modal-overlay">
-                <div className="modal">
+              <div className="modal">
+                <div className="add-post-container">
                   <h2>Add New Discussion</h2>
                   <input
                     type="text"
                     placeholder="Title"
                     value={newPostTitle}
                     onChange={(e) => setNewPostTitle(e.target.value)}
-                    className="modal-input"
+                    className="add-post-title"
                   />
                   <textarea
                     placeholder="Text"
                     value={newPostText}
                     onChange={(e) => setNewPostText(e.target.value)}
-                    className="modal-textarea"
+                    className="add-post-text"
                   />
                   <select
                     value={newPostTheme}
                     onChange={(e) => setNewPostTheme(e.target.value)}
-                    className="modal-select"
+                    className="add-post-theme"
                   >
                     <option value="">Select Theme</option>
                     {themes.map((theme) => (
@@ -348,7 +350,7 @@ const Home: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  <div className="modal-actions">
+                  <div className="add-post-actions">
                     <button onClick={handleSavePost}>Save</button>
                     <button onClick={() => setIsAddPostModalVisible(false)}>
                       Cancel
