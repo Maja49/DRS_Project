@@ -224,17 +224,23 @@ body, html {
   }
   
   .discussion-header {
-    margin-bottom: 10px;
+    margin-bottom: -15px;
     display: flex;
     justify-content: space-between; 
   }
   
   .topic {
     font-size: 12px;
-    color: #888;
+    color: #6b6b6b;
     text-align: left;
   }
 
+  .user
+  {
+    font-size: 11px;
+    color: #888;
+    text-align: left;
+  }
   .discussion-created {
     font-size: 12px;
     color: #888;

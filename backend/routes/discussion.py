@@ -27,6 +27,7 @@ def get_all_discussions():
                 "text": discussion.text,
                 "title": discussion.title,
                 "theme_name": discussion.theme.name,
+                "user_id": discussion.user_id,  # Dodato
                 "created_at": discussion.created_at.isoformat(),  # Convert to ISO format for better readability
                 "updated_at": discussion.updated_at.isoformat() if discussion.updated_at else None,  # If updated_at is None, set to None
                 "likes": discussion.likes,
@@ -111,6 +112,7 @@ def create_discussion():
                 "text": new_discussion.text,
                 "title": new_discussion.title,
                 "theme_name": theme.name,
+                "user_id" : new_discussion.user_id, #Izmenjeno
                 "created_at": new_discussion.created_at,
                 "updated_at": new_discussion.updated_at
             }

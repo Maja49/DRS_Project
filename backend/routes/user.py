@@ -5,6 +5,31 @@ from utils.token_utils import decode_token
 
 user_bp = Blueprint('user', __name__)
 
+# Funkcija za dobavljanje podataka korisnika prema user_id
+@user_bp.route('/get_user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    # Pronalaženje korisnika u bazi prema ID-u
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Prikupljanje podataka o korisniku
+    user_data = {
+        "id": user.id,
+        "name": user.name,
+        "lastname": user.lastname,
+        "adress": user.adress,
+        "city": user.city,
+        "country": user.country,
+        "phone_number": user.phone_number,
+        "email": user.email,
+        "username": user.username,
+        "is_admin": user.is_admin,
+        "is_approved": user.is_approved
+    }
+
+    return jsonify(user_data), 200
+
 # region azuriranje naloga
 # Ažuriranje korisničkog profila
 @user_bp.route('/update_account', methods=['PUT'])

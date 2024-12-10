@@ -11,6 +11,7 @@ interface DiscussionProps {
   updated_at?: string | null;
   likes: number;
   dislikes: number;
+  user_id: number; 
 }
 
 const Discussion: React.FC<DiscussionProps> = ({
@@ -21,15 +22,34 @@ const Discussion: React.FC<DiscussionProps> = ({
   updated_at,
   likes: initialLikes,
   dislikes: initialDislikes,
+  user_id,
 }) => {
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
+
+    useEffect(() => {
+      // Fetch user details based on user_id
+      console.log("Fetching data for user_id:", user_id); 
+
+      fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => setUser(data)) 
+        .catch((error) => console.error("Error fetching user data:", error));
+    }, [user_id]);
+    
 
   const handleLike = () => {
     if (!hasLiked) {
@@ -85,6 +105,7 @@ const formattedTime = created_at ? formatDistanceToNow(new Date(created_at), { a
           <p className="discussion-updated">Updated At: {updated_at}</p>
         )}
       </div>
+      <p className="user">posted by: {user?.username}</p>
       <p className="discussion-title">{title}</p>
       <div className="discussion-text">{text}</div>
       <div className="discussion-actions">
