@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import db
 from models.user import User
 from utils.token_utils import decode_token
+from utils.email_utils import trigger_email
 
 user_bp = Blueprint('user', __name__)
 
@@ -75,3 +76,32 @@ def update_account():
         db.session.rollback()
         return jsonify({"message": "Error updating account", "error": str(e)}), 500
 # endregion
+
+
+@user_bp.route('/approve_registration', methods=['POST'])
+def approve_registration():
+    data = request.json
+    user_id = data.get("user_id")
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"message": "Korisnik ne postoji"}), 404
+
+    user.is_approved = True
+    db.session.commit()
+
+    # Pošaljite email korisniku
+    trigger_email(
+        user.email,
+        "Registracija odobrena",
+        f"Poštovani {user.name}, vaša registracija je odobrena. Dobrodošli!"
+    )
+
+    # Pošaljite email administratoru
+    trigger_email(
+        "celicdorde@gmail.com",
+        "Korisnik odobren",
+        f"Poštovani administratoru, korisnik {user.name} ({user.email}) je uspešno odobren."
+    )
+
+    return jsonify({"message": "Registracija odobrena i email poslat korisniku i administratoru."}), 200

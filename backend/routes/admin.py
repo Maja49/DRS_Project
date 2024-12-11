@@ -203,3 +203,4 @@ def delete_theme(theme_id):
         db.session.rollback()
         print(f"Error deleting theme ID {theme_id}: {traceback.format_exc()}")
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
+
