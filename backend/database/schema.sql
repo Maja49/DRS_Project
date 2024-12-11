@@ -154,7 +154,12 @@ ADD COLUMN updated_at TIMESTAMP NULL;
 ---DODAJTE KOLONU TITLE U DISCUSSION TABELI
 ALTER TABLE discussion ADD COLUMN title TEXT NOT NULL;
 
---DODAJTE KOLONU IS_FIRST_LOGIN U USER TABELI
-ALTER TABLE user
-ADD COLUMN is_first_login BOOLEAN DEFAULT TRUE;
-
+--POSLEDNJE PROMJENE
+drop table commentdiscussion;
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,
+    discussion_id INT NOT NULL,
+    PRIMARY KEY (comment_id, discussion_id),
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);

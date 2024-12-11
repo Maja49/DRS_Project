@@ -3,7 +3,8 @@ from models import db
 from models.comment import Comment
 from models.user import User
 from models.discussion import Discussion
-from utils.token_utils import decode_token  # Importuj funkciju za dekodiranje tokena
+from models.commentdiscussion import CommentDiscussion  # Importuj CommentDiscussion model
+from utils.token_utils import decode_token
 
 # Kreiranje Blueprint-a za komentare
 comment_bp = Blueprint('comment', __name__)
@@ -61,11 +62,24 @@ def comment_discussion(discussion_id):
     )
 
     try:
-        print(f"Adding comment: {new_comment}")
+        # Dodavanje komentara u tabelu 'comment'
         db.session.add(new_comment)
         db.session.commit()
-        return jsonify({"message": "Comment added successfully"}), 201
+
+        # Dodavanje veze u tabelu 'comment_discussion'
+        commentdiscussion = CommentDiscussion(
+            comment_id=new_comment.id,
+            discussion_id=discussion_id
+        )
+        db.session.add(commentdiscussion)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Comment added successfully",
+            "comment_id": new_comment.id,
+            "discussion_id": discussion_id
+        }), 201
     except Exception as e:
-        print(f"Error: {e}")
         db.session.rollback()
+        print(f"Error: {e}")
         return jsonify({"message": f"Database error: {str(e)}"}), 500
