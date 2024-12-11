@@ -154,3 +154,12 @@ ADD COLUMN updated_at TIMESTAMP NULL;
 ---DODAJTE KOLONU TITLE U DISCUSSION TABELI
 ALTER TABLE discussion ADD COLUMN title TEXT NOT NULL;
 
+--POSLEDNJE PROMJENE
+drop table commentdiscussion;
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,
+    discussion_id INT NOT NULL,
+    PRIMARY KEY (comment_id, discussion_id),
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);
