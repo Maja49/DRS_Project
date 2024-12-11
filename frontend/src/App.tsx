@@ -12,6 +12,8 @@ import SignUp from "./pages/SignUp";
 import AdminPage from "./pages/AdminPage";
 import User from "./pages/User";
 import Home from "./pages/Home";
+import Discussions from "./pages/Discussions";
+
 import "./App.css";
 
 const App: React.FC = () => {
@@ -24,6 +26,7 @@ const App: React.FC = () => {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/user" element={<User />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/discussions" element={<Discussions />} />
       </Routes>
     </Router>
   );

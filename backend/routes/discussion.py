@@ -155,13 +155,18 @@ def update_discussion(discussion_id):
     # Ako je sve u redu, ažuriramo diskusiju
     data = request.get_json()
     text = data.get('text')
+    title = data.get('title')
 
     if not text:
         return jsonify({"message": "Text is required"}), 400
     
+    if not title:
+        return jsonify({"message": "Title is required"}), 400
+    
     current_time = datetime.now(timezone.utc)
 
     discussion.text = text  # Ažuriramo tekst diskusije
+    discussion.title = title
     discussion.updated_at = current_time  # Postavljamo updated_at na trenutni datum i vreme
 
     try:
@@ -391,4 +396,34 @@ def search_discussions():
         })
 
     return jsonify(results), 200
+# endregion
+
+# region discussions by user
+@discussion_bp.route('/get_by_user/<int:user_id>', methods=['GET'])
+def get_discussions_by_user(user_id):
+    try:
+        # Filter by user
+        discussions = Discussion.query.filter_by(user_id=user_id).order_by(Discussion.created_at.desc()).all()
+        
+        discussions_data = []
+        for discussion in discussions:
+            discussions_data.append({
+                "id": discussion.id,
+                "text": discussion.text,
+                "title": discussion.title,
+                "theme_name": discussion.theme.name,
+                "user_id": discussion.user_id,  
+                "created_at": discussion.created_at.isoformat(),  # Convert to ISO format
+                "updated_at": discussion.updated_at.isoformat() if discussion.updated_at else None,  # Handle None
+                "likes": discussion.likes,
+                "dislikes": discussion.dislikes,
+            })
+
+        return jsonify({
+            "message": "Discussions retrieved successfully",
+            "discussions": discussions_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 # endregion
