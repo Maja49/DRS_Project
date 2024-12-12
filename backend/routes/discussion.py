@@ -398,7 +398,7 @@ def search_discussions():
     return jsonify(results), 200
 # endregion
 
-# region discussions by user
+# region discussions by user -- dobijaju se sve diskusije odredjenog usera
 @discussion_bp.route('/get_by_user/<int:user_id>', methods=['GET'])
 def get_discussions_by_user(user_id):
     try:
