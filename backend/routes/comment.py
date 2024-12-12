@@ -11,6 +11,7 @@ import re
 # Kreiranje Blueprint-a za komentare
 comment_bp = Blueprint('comment', __name__)
 
+# region creating new comment(enabled to mention user)
 @comment_bp.route('/comment/<int:discussion_id>', methods=['POST'])
 def comment_discussion(discussion_id):
     # Provera tokena iz Authorization zaglavlja
@@ -87,6 +88,13 @@ def comment_discussion(discussion_id):
         db.session.add(new_comment)
         db.session.commit()
 
+        new_comment_discussion = CommentDiscussion(
+        comment_id=new_comment.id,
+        discussion_id=discussion_id
+        )
+        db.session.add(new_comment_discussion)
+        db.session.commit()
+
         return jsonify({
             "message": "Comment added successfully",
             "comment_id": new_comment.id,
@@ -97,9 +105,9 @@ def comment_discussion(discussion_id):
         db.session.rollback()
         print(f"Error: {e}")
         return jsonify({"message": f"Database error: {str(e)}"}), 500
+# endregion
 
-
-#dobavljanje komentara diskusije
+# region getting comments of one discussion(with discussion id)
 @comment_bp.route('/getcomments/<int:discussion_id>', methods=['GET'])
 def get_comments_by_discussion(discussion_id):
     try:
@@ -129,3 +137,56 @@ def get_comments_by_discussion(discussion_id):
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"message": f"An error occurred: {str(e)}"}), 500
+# endregion
+
+
+# region deleting comment
+@comment_bp.route('/deletecomment/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    # Provera tokena iz Authorization zaglavlju
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"message": "Authorization token is missing"}), 401
+
+    try:
+        # Ekstrakcija tokena (uklanjanje "Bearer " prefiksa)
+        token = token.split()[1]
+    except IndexError:
+        return jsonify({"message": "Invalid token format"}), 400
+
+    # Validacija i dekodovanje tokena
+    decoded = decode_token(token)
+    if "error" in decoded:
+        return jsonify({"message": decoded["error"]}), 403
+
+    user_id = decoded.get('user_id')  # Izvlačenje ID korisnika iz tokena
+    if not user_id:
+        return jsonify({"message": "User ID not found in token"}), 403
+
+    # Proveri korisnika
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # Pretraga komentara
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({"message": "Comment not found"}), 404
+
+    # Proveravamo kojoj diskusiji komentar pripada
+    discussion = Discussion.query.get(comment.discussion_id)
+    if not discussion:
+        return jsonify({"message": "Discussion not found"}), 404
+
+    # Korisnik može da obriše komentar ako je autor diskusije ili ako je autor komentara
+    if user.is_admin == 1 or user_id == comment.user_id or user_id == discussion.user_id:
+        try:
+            db.session.delete(comment)  # Brisanje komentara
+            db.session.commit()
+            return jsonify({"message": "Comment deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": f"Error deleting comment: {str(e)}"}), 500
+    else:
+        return jsonify({"message": "You do not have permission to delete this comment"}), 403
+# endregion
