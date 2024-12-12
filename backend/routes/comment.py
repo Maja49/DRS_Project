@@ -83,3 +83,35 @@ def comment_discussion(discussion_id):
         db.session.rollback()
         print(f"Error: {e}")
         return jsonify({"message": f"Database error: {str(e)}"}), 500
+
+
+#dobavljanje komentara diskusije
+@comment_bp.route('/getcomments/<int:discussion_id>', methods=['GET'])
+def get_comments_by_discussion(discussion_id):
+    try:
+        # Proveravamo da li diskusija postoji
+        discussion = Discussion.query.get(discussion_id)
+        if not discussion:
+            return jsonify({"message": "Discussion not found"}), 404
+
+        # Dohvatamo sve zapise iz tabele 'comment_discussion' za dati discussion_id
+        comment_discussions = CommentDiscussion.query.filter_by(discussion_id=discussion_id).all()
+        if not comment_discussions:
+            return jsonify({"message": "No comments found for this discussion"}), 404
+
+        # Prikupljamo komentare povezane sa diskusijom
+        comments = []
+        for cd in comment_discussions:
+            comment = Comment.query.get(cd.comment_id)
+            if comment:
+                comments.append({
+                    "comment_id": comment.id,
+                    "user_id": comment.user_id,
+                    "text": comment.text,
+                    "mentioned_user_id": comment.mentioned_user_id
+                })
+
+        return jsonify(comments), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": f"An error occurred: {str(e)}"}), 500
