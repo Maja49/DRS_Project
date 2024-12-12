@@ -5,6 +5,8 @@ from models.user import User
 from models.discussion import Discussion
 from utils.token_utils import decode_token
 import traceback
+from .email_sender import send_email
+
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -57,12 +59,20 @@ def accept_registration_request(user_id):
     user.is_approved = True
     try:
         db.session.commit()
+
+        # Slanje email-a korisniku da je registracija prihvaćena
+        subject = "Registration Accepted"
+        body = f"Dear {user.name} {user.lastname},\n\nYour registration has been successfully accepted. You can now log in to your account."
+        send_email(subject, [user.email], body)
+        
         return jsonify({"message": "User registration accepted"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": "Error accepting registration", "error": str(e)}), 500
+        return jsonify({
+            "message": "Error accepting registration",
+            "error": str(e)
+        }), 500
 
-# Odbijanje korisnikovog zahtjeva za registraciju
 @admin_bp.route('/registration-requests/reject/<int:user_id>', methods=['DELETE'])
 @admin_required
 def reject_registration_request(user_id):
@@ -74,10 +84,19 @@ def reject_registration_request(user_id):
     try:
         db.session.delete(user)
         db.session.commit()
+
+        # Slanje email-a korisniku da je registracija odbijena
+        subject = "Registration Rejected"
+        body = f"Dear {user.name} {user.lastname},\n\nWe regret to inform you that your registration has been rejected."
+        send_email(subject, [user.email], body)
+        
         return jsonify({"message": "User registration rejected and user deleted"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": "Error rejecting registration", "error": str(e)}), 500
+        return jsonify({
+            "message": "Error rejecting registration",
+            "error": str(e)
+        }), 500
 
 
 # region preuzimanje svih korisnika

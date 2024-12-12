@@ -5,8 +5,11 @@ import config
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from routes.email_sender import mail
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
+app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
+mail.init_app(app)
 
 CORS(app, origins="http://localhost:5173")
 
