@@ -5,6 +5,8 @@ from models.user import User
 from models.discussion import Discussion
 from models.commentdiscussion import CommentDiscussion  # Importuj CommentDiscussion model
 from utils.token_utils import decode_token
+from utils.email_utils import trigger_email  # Pretpostavljamo da postoji funkcija za slanje emaila
+import re 
 
 # Kreiranje Blueprint-a za komentare
 comment_bp = Blueprint('comment', __name__)
@@ -42,9 +44,6 @@ def comment_discussion(discussion_id):
         return jsonify({"message": "Invalid JSON data"}), 400
 
     text = data.get('text')
-    mentioned_user_id = data.get('mentioned_user_id')  # Opcionalno
-
-    # Validacija teksta komentara
     if not text or not text.strip():
         return jsonify({"message": "Text is required and cannot be empty"}), 400
 
@@ -52,6 +51,28 @@ def comment_discussion(discussion_id):
     discussion = Discussion.query.get(discussion_id)
     if not discussion:
         return jsonify({"message": "Discussion not found"}), 404
+
+    # Ekstrakcija korisničkog imena posle '@' iz teksta komentara
+    mentioned_user_id = None
+    mentioned_usernames = re.findall(r"@([a-zA-Z0-9_]+)", text)  # Traži korisnička imena
+    if mentioned_usernames:
+        # Proveravamo prvo korisničko ime (može se proširiti za više korisnika)
+        mentioned_username = mentioned_usernames[0]
+        mentioned_user = User.query.filter_by(username=mentioned_username).first()
+
+        if mentioned_user:
+            mentioned_user_id = mentioned_user.id
+
+            # Slanje email-a administratoru
+            try:
+                trigger_email(
+                    "celicdorde@gmail.com",
+                    "Mention notification",
+                    f"You(@{mentioned_username}) have been mentioned in discussion with title '{discussion.title}' by @{user.username}."
+                )
+                print("Email uspešno poslat.")
+            except Exception as e:
+                print(f"Greška prilikom slanja email-a: {e}")
 
     # Kreiranje novog komentara
     new_comment = Comment(
@@ -66,20 +87,45 @@ def comment_discussion(discussion_id):
         db.session.add(new_comment)
         db.session.commit()
 
-        # Dodavanje veze u tabelu 'comment_discussion'
-        commentdiscussion = CommentDiscussion(
-            comment_id=new_comment.id,
-            discussion_id=discussion_id
-        )
-        db.session.add(commentdiscussion)
-        db.session.commit()
-
         return jsonify({
             "message": "Comment added successfully",
             "comment_id": new_comment.id,
-            "discussion_id": discussion_id
+            "discussion_id": discussion_id,
+            "mentioned_user_id": mentioned_user_id
         }), 201
     except Exception as e:
         db.session.rollback()
         print(f"Error: {e}")
         return jsonify({"message": f"Database error: {str(e)}"}), 500
+
+
+#dobavljanje komentara diskusije
+@comment_bp.route('/getcomments/<int:discussion_id>', methods=['GET'])
+def get_comments_by_discussion(discussion_id):
+    try:
+        # Proveravamo da li diskusija postoji
+        discussion = Discussion.query.get(discussion_id)
+        if not discussion:
+            return jsonify({"message": "Discussion not found"}), 404
+
+        # Dohvatamo sve zapise iz tabele 'comment_discussion' za dati discussion_id
+        comment_discussions = CommentDiscussion.query.filter_by(discussion_id=discussion_id).all()
+        if not comment_discussions:
+            return jsonify({"message": "No comments found for this discussion"}), 404
+
+        # Prikupljamo komentare povezane sa diskusijom
+        comments = []
+        for cd in comment_discussions:
+            comment = Comment.query.get(cd.comment_id)
+            if comment:
+                comments.append({
+                    "comment_id": comment.id,
+                    "user_id": comment.user_id,
+                    "text": comment.text,
+                    "mentioned_user_id": comment.mentioned_user_id
+                })
+
+        return jsonify(comments), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": f"An error occurred: {str(e)}"}), 500
