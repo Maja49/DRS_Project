@@ -163,3 +163,7 @@ CREATE TABLE commentdiscussion (
     FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
     FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
 );
+
+--DODAVANJE NOVOG POLJA U USER TABELI
+ALTER TABLE user
+ADD COLUMN is_first_login BOOLEAN DEFAULT TRUE;
