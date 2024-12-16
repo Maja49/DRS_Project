@@ -370,6 +370,19 @@ body, html {
   text-align: left;
 }
 
+.delete-comment-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-left: 10px;
+  text-align: right;
+}
+.delete-comment-button:hover {
+  color: darkred;
+}
+
 .modal {
   display: flex;
   position: fixed;

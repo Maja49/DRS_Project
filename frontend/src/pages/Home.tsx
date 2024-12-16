@@ -3,11 +3,12 @@ import { formatDistanceToNow } from "date-fns"; // instalirajte ovo
 import "./Home.css";
 
 interface User {
+  id: number;
   username: string;
 }
 
 interface Comment {
-  id: number;
+  comment_id: number;
   user_id: number; 
   text: string; 
   mentioned_user_id?: number | null;
@@ -42,12 +43,12 @@ const Discussion: React.FC<DiscussionProps> = ({
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [users, setUsers] = useState<string[]>([]); 
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<Comment>({
-    id: 0, 
+    comment_id: 0, 
     user_id: 0, 
     text: "",
     mentioned_user_id: null ,
@@ -80,6 +81,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   
       fetchUsers();
     }, [comments]);  // Učitava kada se komentari promene
+
     useEffect(() => {
       // Fetch user details based on user_id
       fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
@@ -89,14 +91,17 @@ const Discussion: React.FC<DiscussionProps> = ({
   
       // Fetch comments for this discussion when comment section is visible
       if (isCommentSectionVisible) {
-        fetch(`http://localhost:5000/api/comment/getcomments//${id}`)
+        fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
           .then((response) => {
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
           })
-          .then((data) => setComments(data))
+          .then((data) => {
+            console.log(data);  // Prikazuje šta tačno server vraća
+            setComments(data);
+          })
           .catch((error) => console.error("Error fetching comments:", error));
 
       }
@@ -161,6 +166,7 @@ const Discussion: React.FC<DiscussionProps> = ({
         if (response.ok) {
           setComments([...comments, data]); // Add the new comment to the comments list
           setNewComment({ ...newComment, text: "" }); // Clear the input field
+          
         } else {
           console.error("Error adding comment:", data.message);
         }
@@ -170,10 +176,38 @@ const Discussion: React.FC<DiscussionProps> = ({
     }
   };
   
-
   const handleCancelComment = () => {
-    setNewComment({ id: 0, user_id: 0, text: "", mentioned_user_id: null, discussion_id: 0 });
+    setNewComment({ comment_id: 0, user_id: 0, text: "", mentioned_user_id: null, discussion_id: 0 });
   };
+  
+const handleDeleteComment = (commentId: number) => {
+  const token = localStorage.getItem("auth_token");
+  console.log("Id komentara: "+ commentId);
+  if (!token) {
+    console.error("No authentication token found.");
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/comment/deletecomment/${commentId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        // Remove the deleted comment from the comments list
+        setComments(comments.filter((comment) => comment.comment_id !== commentId));
+      } else {
+        return response.json().then((data) => {
+          console.error("Error deleting comment:", data.message);
+        });
+      }
+    })
+    .catch((error) => console.error("Error deleting comment:", error));
+};
+  
   
 
 const formattedTime = created_at ? formatDistanceToNow(new Date(created_at), { addSuffix: true }) : "Invalid date";
@@ -231,17 +265,31 @@ const formattedTime = created_at ? formatDistanceToNow(new Date(created_at), { a
 
             {/* List of comments */}
             <div className="comments-list">
-              {comments.length > 0 ? (
-                comments.map((comment, index) => (
-                  <div key={comment.id} className="comment">
+            {comments.length > 0 ? (
+              comments.map((comment, index) => {
+                console.log("Provera pre slanja id: "+ comment.comment_id); // Logovanje id-a komentara
+                console.log("Provera komentara: ", comment);
+
+                return (
+                  <div key={comment.comment_id} className="comment">
                     <p>
-                      <strong>{users[index] || 'loading..'}</strong>: {comment.text}
+                      <strong>{users[index] || "loading.."}</strong>: {comment.text}
+                      {(comment.user_id === user_id || user_id === user?.id) && (
+                        <button
+                          className="delete-comment-button"
+                          onClick={() => handleDeleteComment(comment.comment_id)} // Pass comment.id correctly
+                        >
+                          ❌
+                        </button>
+                      )}
                     </p>
                   </div>
-                ))
-              ) : (
-                <p>No comments yet. Be the first to comment!</p>
-              )}
+                );
+              })
+            ) : (
+              <p>No comments yet. Be the first to comment!</p>
+            )}
+
             </div>
           </div>
         )}
