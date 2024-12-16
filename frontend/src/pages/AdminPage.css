@@ -95,7 +95,7 @@ button.submit-button:hover {
   margin-right: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #555;
+  color: white;
   text-transform: uppercase;
 }
 
@@ -105,6 +105,7 @@ button.submit-button:hover {
 }
 
 .tabs button:focus {
+  color: blue;
   outline: none;
 }
 
@@ -235,4 +236,10 @@ ul {
 
 .delete-button:active {
   transform: translateY(1px);
+}
+
+.discussions-section {
+  position: relative;
+  margin-top: 20px;
+  max-height: calc(100vh - 120px);
 }
