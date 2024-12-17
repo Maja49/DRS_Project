@@ -209,6 +209,11 @@ def delete_discussion(discussion_id):
 
     # Ako je sve u redu, brišemo diskusiju
     try:
+        # Dodatak - moraju komenntari da se obrisi za diskusiju koja se brise 
+        comments = Comment.query.filter_by(discussion_id=discussion_id).all()
+        for comment in comments:
+            db.session.delete(comment)
+
         db.session.delete(discussion)
         db.session.commit()
         return jsonify({"message": "Discussion deleted successfully"}), 200
@@ -256,11 +261,12 @@ def like_dislike_discussion(discussion_id):
     existing_entry = LikeDislike.query.filter_by(user_id=user_id, discussion_id=discussion_id).first()
 
     if existing_entry:
-        # Ako korisnik želi da promeni akciju
+        # Izmena - da ako klikne opet like/dislike, on se obrise
         if existing_entry.action == action:
-            return jsonify({"message": f"You have already {action}d this discussion"}), 400
-        # Ažuriraj akciju ako je drugačija
-        existing_entry.action = action
+            db.session.delete(existing_entry)
+        else:
+            # Promeni akciju ako korisnik želi suprotnu
+            existing_entry.action = action
     else:
         # Ako korisnik još nije lajkovao/dislajkovao, napravi novi unos
         new_entry = LikeDislike(user_id=user_id, discussion_id=discussion_id, action=action)

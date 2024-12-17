@@ -37,9 +37,13 @@ const Discussion: React.FC<DiscussionProps> = ({
   dislikes: initialDislikes,
   user_id,
 }) => {
+  const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
+
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
+  const [userAction, setUserAction] = useState<"like" | "dislike" | null>(null);
+
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [users, setUsers] = useState<string[]>([]);
@@ -52,6 +56,61 @@ const Discussion: React.FC<DiscussionProps> = ({
     mentioned_user_id: null,
     discussion_id: 0,
   });
+
+  function fetchDiscussions() {
+    console.log("Fetching discussions...");
+    
+    fetch("http://localhost:5000/api/discussion/get_all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setDiscussions(data.discussions);
+      })
+      .catch((error) => {
+        console.error("Error fetching discussions:", error);
+        alert("Došlo je do greške prilikom preuzimanja diskusija.");
+      });
+  }
+
+  const handleAction = (action: "like" | "dislike") => {
+    fetch(`http://localhost:5000/api/discussion/like_dislike/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+      },
+      body: JSON.stringify({ action }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Ažuriraj UI samo za ovu diskusiju
+          if (userAction === action) {
+            // Ako je isti akcija, poništi
+            if (action === "like") setLikes((prev) => prev - 1);
+            if (action === "dislike") setDislikes((prev) => prev - 1);
+            setUserAction(null);
+          } else {
+            // Ako je druga akcija, poništi staru i postavi novu
+            if (userAction === "like") setLikes((prev) => prev - 1);
+            if (userAction === "dislike") setDislikes((prev) => prev - 1);
+  
+            if (action === "like") setLikes((prev) => prev + 1);
+            if (action === "dislike") setDislikes((prev) => prev + 1);
+  
+            setUserAction(action);
+          }
+        } else {
+          console.error("Error updating like/dislike:", data.message);
+        }
+      })
+      .catch((error) => console.error("Error in like/dislike action:", error));
+  };
+  
 
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
@@ -194,15 +253,15 @@ const Discussion: React.FC<DiscussionProps> = ({
       <p className="discussion-title">{title}</p>
       <div className="discussion-text">{text}</div>
       <div className="discussion-actions">
-        <button
-          className={`like-button ${hasLiked ? "active" : ""}`}
-          onClick={handleLike}
+      <button
+          className={`like-button ${userAction === "like" ? "active" : ""}`}
+          onClick={() => handleAction("like")}
         >
           ❤️ {likes}
         </button>
         <button
-          className={`dislike-button ${hasDisliked ? "active" : ""}`}
-          onClick={handleDislike}
+          className={`dislike-button ${userAction === "dislike" ? "active" : ""}`}
+          onClick={() => handleAction("dislike")}
         >
           💔 {dislikes}
         </button>
@@ -302,6 +361,8 @@ const Home: React.FC = () => {
       .catch((error) => console.error("Error fetching discussions:", error));
   }, []);
 
+ 
+  
   /*useEffect(() => {
     fetch("http://localhost:5000/api/discussion/get_all")
       .then((response) => {
