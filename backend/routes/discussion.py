@@ -9,6 +9,7 @@ from models.likeDislike import LikeDislike
 from models.comment import Comment
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.token_utils import decode_token
+import re
 
 discussion_bp = Blueprint('discussion', __name__)
 
@@ -45,20 +46,6 @@ def get_all_discussions():
 
 # region all themes
 # Ruta za dobijanje svih tema za popunjavanje padajućeg menija
-@discussion_bp.route('/themes', methods=['GET'])
-def get_all_themes():
-    themes = Theme.query.all()
-    if not themes:
-        return jsonify({"message": "No themes available"}), 404
-    
-    return jsonify([
-        {"id": theme.id, "name": theme.name, "description": theme.description}
-        for theme in themes
-    ]), 200
-# endregion
-
-
-# region create discussion
 @discussion_bp.route('/create', methods=['POST'])
 def create_discussion():
     token = request.headers.get('Authorization')
@@ -89,7 +76,21 @@ def create_discussion():
     if not theme:
         return jsonify({"message": f"Theme with name '{theme_name}' not found"}), 404
 
+    # Regex za pronalaženje korisničkog imena koje dolazi posle @
+    mentioned_user_id = None
+    match = re.search(r'@([a-zA-Z0-9_]+)', text)  # Regex za korisničko ime
+    if match:
+        mentioned_user_name = match.group(1)
+
+        # Pronađi korisnika prema korisničkom imenu
+        mentioned_user = User.query.filter_by(username=mentioned_user_name).first()
+        if mentioned_user:
+            mentioned_user_id = mentioned_user.id
+        else:
+            mentioned_user_id = None
+
     current_time = datetime.now(timezone.utc)
+    
     # Kreiranje diskusije sa automatskim postavljanjem vremena
     new_discussion = Discussion(
         text=text,
@@ -98,6 +99,7 @@ def create_discussion():
         likes=0,
         dislikes=0,
         user_id=user_id,
+        mentioned_user=mentioned_user_id,  # Dodajemo ID pomenutog korisnika ili NULL
         created_at=current_time,  # Postavljamo trenutni datum i vreme
         updated_at=None  # Inicijalno NULL
     )
@@ -112,7 +114,8 @@ def create_discussion():
                 "text": new_discussion.text,
                 "title": new_discussion.title,
                 "theme_name": theme.name,
-                "user_id" : new_discussion.user_id, #Izmenjeno
+                "user_id": new_discussion.user_id,
+                "mentioned_user_id": new_discussion.mentioned_user,  # Dodajemo ID pomenutog korisnika
                 "created_at": new_discussion.created_at,
                 "updated_at": new_discussion.updated_at
             }
@@ -120,6 +123,7 @@ def create_discussion():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
+
 # endregion
 
 

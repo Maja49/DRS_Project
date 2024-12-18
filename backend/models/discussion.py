@@ -16,7 +16,8 @@ class Discussion(db.Model):
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  # Automatically sets creation time in UTC
     updated_at = db.Column(db.DateTime, default=None, onupdate=lambda: datetime.now(timezone.utc))  # Initially None, updated on change
-
+    mentioned_user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
 
 
     # Definisanje odnosa sa tabelom Theme
