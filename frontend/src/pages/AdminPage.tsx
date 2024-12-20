@@ -174,39 +174,43 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevents page refresh
-    console.log("Search started with query:", searchQuery);
+    e.preventDefault(); // Sprečava osvežavanje stranice
+
+    const queryParams: { [key: string]: string } = {};
+
+    // Dodaj parametar u queryParams objekat
     if (searchQuery.trim()) {
-      fetch(
-        `http://localhost:5000/api/discussion/search?theme_name=${searchQuery}`
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Search Results:", data);
-          setDiscussions(data); // Sets discussions to the search results
-        })
-        .catch((error) => {
-          console.error("Error fetching search results:", error);
-        });
-    } else {
-      console.log("Search query is empty");
-      fetch("http://localhost:5000/api/discussion/get_all")
-        .then((response) => response.json())
-        .then((data) => setDiscussions(data.discussions))
-        .catch((error) => console.error("Error fetching discussions:", error));
+      queryParams.theme_name = searchQuery.trim(); // Ovdje se može menjati parametar u zavisnosti od unosa
     }
+
+    // Kreiraj URL sa parametrima
+    const queryString = new URLSearchParams(queryParams).toString();
+    const url = queryString
+      ? `http://localhost:5000/api/discussion/search?${queryString}`
+      : `http://localhost:5000/api/discussion/get_all`;
+
+    // Fetch zahteva za pretragu
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Search Results:", data);
+        setDiscussions(data); // Postavi rezultate pretrage
+      })
+      .catch((error) => {
+        console.error("Error fetching search results:", error);
+      });
   };
 
-  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch(e);
-    }
-  };
+  // const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+  //   if (e.key === "Enter") {
+  //     handleSearch(e);
+  //   }
+  // };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -382,10 +386,14 @@ const AdminPage: React.FC = () => {
           <div className="search-container">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search by Theme Name, Email, etc."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearchKeyPress}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch(e);
+                }
+              }}
               className="search-input"
             />
             <img src="/search.png" alt="Search Icon" className="search-icon" />
