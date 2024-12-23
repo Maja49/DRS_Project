@@ -32,7 +32,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
   title,
   theme_name,
   created_at,
-  updated_at,
+  // updated_at,
   likes: initialLikes,
   dislikes: initialDislikes,
   user_id,
@@ -93,7 +93,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
     // Fetch comments for this discussion when comment section is visible
     if (isCommentSectionVisible) {
-      fetch(`http://localhost:5000/api/comment/getcomments//${id}`)
+      fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -153,31 +153,63 @@ export const Discussion: React.FC<DiscussionProps> = ({
       .catch((error) => console.error("Error updating discussion:", error));
   };
 
-  const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(likes + 1);
-      if (hasDisliked) {
-        setDislikes(dislikes - 1);
-        setHasDisliked(false);
-      }
-      setHasLiked(true);
-    } else {
-      setLikes(likes - 1);
-      setHasLiked(false);
+  const handleLikeDislike = async (action: "like" | "dislike") => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      alert("You need to be logged in to perform this action.");
+      return;
     }
-  };
 
-  const handleDislike = () => {
-    if (!hasDisliked) {
-      setDislikes(dislikes + 1);
-      if (hasLiked) {
-        setLikes(likes - 1);
-        setHasLiked(false);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/discussion/like_dislike/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ action }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (action === "like") {
+          // Ako korisnik ponovo lajkuje, undo
+          if (hasLiked) {
+            setLikes(likes - 1);
+            setHasLiked(false);
+          } else {
+            setLikes(likes + 1);
+            setHasLiked(true);
+
+            if (hasDisliked) {
+              setDislikes(dislikes - 1);
+              setHasDisliked(false);
+            }
+          }
+        } else if (action === "dislike") {
+          // Ako korisnik ponovo dislajkuje, undo
+          if (hasDisliked) {
+            setDislikes(dislikes - 1);
+            setHasDisliked(false);
+          } else {
+            setDislikes(dislikes + 1);
+            setHasDisliked(true);
+
+            if (hasLiked) {
+              setLikes(likes - 1);
+              setHasLiked(false);
+            }
+          }
+        }
+      } else {
+        console.error(data.message || "An error occurred.");
       }
-      setHasDisliked(true);
-    } else {
-      setDislikes(dislikes - 1);
-      setHasDisliked(false);
+    } catch (error) {
+      console.error("Error sending like/dislike request:", error);
     }
   };
 
@@ -233,6 +265,38 @@ export const Discussion: React.FC<DiscussionProps> = ({
     });
   };
 
+  const handleDeleteComment = async (commentId: number) => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      alert("You need to be logged in to perform this action.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/comment/deletecomment/${commentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setComments((prevComments) =>
+          prevComments.filter((comment) => comment.id !== commentId)
+        );
+        console.log("Comment deleted successfully");
+      } else {
+        const data = await response.json();
+        console.error(data.message || "Failed to delete comment");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
   const formattedTime = created_at
     ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
     : "Invalid date";
@@ -255,13 +319,13 @@ export const Discussion: React.FC<DiscussionProps> = ({
           <div className="discussion-actions">
             <button
               className={`like-button ${hasLiked ? "active" : ""}`}
-              onClick={handleLike}
+              onClick={() => handleLikeDislike("like")}
             >
               ❤️ {likes}
             </button>
             <button
               className={`dislike-button ${hasDisliked ? "active" : ""}`}
-              onClick={handleDislike}
+              onClick={() => handleLikeDislike("dislike")}
             >
               💔 {dislikes}
             </button>
@@ -335,6 +399,15 @@ export const Discussion: React.FC<DiscussionProps> = ({
                       <strong>{users[index] || "loading.."}</strong>:{" "}
                       {comment.text}
                     </p>
+                    <button
+                      className="delete-comment-button"
+                      data-id={comment.id}
+                      onClick={() =>
+                        comment.id && handleDeleteComment(comment.id)
+                      }
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 ))
               ) : (

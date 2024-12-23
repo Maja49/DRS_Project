@@ -359,6 +359,12 @@ html {
   border-radius: 5px;
   width: 100%;
   word-wrap: break-word;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
 }
 
 .modal {
@@ -448,4 +454,19 @@ html {
 
 .btn-cancel:hover {
   background-color: #e2e6ea;
+}
+
+.delete-comment-button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-left: 10px;
+  align-self: flex-start;
+}
+
+.delete-comment-button:hover {
+  background-color: transparent;
 }
