@@ -1,0 +1,245 @@
+.admin-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h1,
+h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #e53935;
+  background-color: #fdecea;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  color: green;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.add-theme-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  height: 100px;
+}
+
+button.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button.submit-button:hover {
+  background-color: #45a049;
+}
+
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 100px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+  height: 50px;
+}
+
+.tabs button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  text-transform: uppercase;
+}
+
+.tabs button:hover {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+.tabs button:focus {
+  color: blue;
+  outline: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th,
+table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+table tr:hover {
+  background-color: #f9f9f9;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.request-item {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: calc(33.33% - 20px);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  min-width: 300px;
+  box-sizing: border-box;
+}
+
+.request-item p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.request-item p strong {
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.accept-button,
+.reject-button,
+.add-theme-button {
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  width: 48%;
+}
+
+.add-theme-button {
+  background-color: #4caf50;
+  color: white;
+  margin-bottom: 14px;
+}
+
+.accept-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.reject-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.accept-button:hover {
+  background-color: #45a049;
+  box-shadow: 0 2px 5px rgba(0, 128, 0, 0.2);
+}
+
+.reject-button:hover {
+  background-color: #e53935;
+  box-shadow: 0 2px 5px rgba(255, 0, 0, 0.2);
+}
+
+.no-requests,
+.no-users {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+}
+
+.delete-button {
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #e53935;
+  transform: translateY(-2px);
+}
+
+.delete-button:active {
+  transform: translateY(1px);
+}
+
+.discussions-section {
+  position: relative;
+  margin-top: 20px;
+  max-height: calc(100vh - 120px);
+}

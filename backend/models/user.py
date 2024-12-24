@@ -20,6 +20,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
     is_approved = db.Column(db.Boolean, default=False) 
+    is_first_login = db.Column(db.Boolean, default=True) 
     
     # Promeni naziv backref-a na nešto drugo
     likes_dislikes = db.relationship('LikeDislike', back_populates='user', lazy=True)

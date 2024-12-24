@@ -1,9 +1,17 @@
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp, user_bp
 from models import db
 import config
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+from flask_socketio import SocketIO
+from routes.email_sender import mail
 
 app = Flask(__name__) #inicijalizacija flask aplikacije
+app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
+mail.init_app(app)
+
+CORS(app, origins="http://localhost:5173")
 
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
@@ -33,6 +41,8 @@ app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
 # Registrovanje comment Blueprint-a
 app.register_blueprint(comment_bp, url_prefix='/api/comment')  
 
+# Registrovanje user Blueprint-a
+app.register_blueprint(user_bp, url_prefix='/api/user')  
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,19 +1,34 @@
 {
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "xprotocol",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 33060,
-            "driver": "MySQL",
-            "name": "DRS",
-            "database": "drs",
-            "username": "root",
-            "password": "2310",
-            "connectionTimeout": 30
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "xprotocol",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 33065,
+      "driver": "MySQL",
+      "name": "DRS",
+      "database": "drs",
+      "username": "root",
+      "password": "2310",
+      "connectionTimeout": 30
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "xprotocol",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 33060,
+      "driver": "MySQL",
+      "name": "DRS1",
+      "password": "2310",
+      "connectionTimeout": 30,
+      "username": "root",
+      "database": "drs"
+    }
+  ]
 }

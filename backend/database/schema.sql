@@ -120,6 +120,8 @@ CREATE TABLE commentdiscussion (
     FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
 );
 
+
+
 CREATE TABLE like_dislike (
     id INT AUTO_INCREMENT PRIMARY KEY, -- Primarni ključ sa automatskim povećanjem
     user_id INT NOT NULL,              -- ID korisnika koji lajkuje/dislajkuje
@@ -143,3 +145,25 @@ FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE;
 -- Uklanjanje kolone post_id ako više nije potrebna
 ALTER TABLE comment 
 DROP COLUMN post_id;
+
+-- Dodavanje vremenskih oznaka u tabelu discussion
+ALTER TABLE discussion
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+ADD COLUMN updated_at TIMESTAMP NULL;
+
+---DODAJTE KOLONU TITLE U DISCUSSION TABELI
+ALTER TABLE discussion ADD COLUMN title TEXT NOT NULL;
+
+--POSLEDNJE PROMJENE
+drop table commentdiscussion;
+CREATE TABLE commentdiscussion (
+    comment_id INT NOT NULL,
+    discussion_id INT NOT NULL,
+    PRIMARY KEY (comment_id, discussion_id),
+    FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+    FOREIGN KEY (discussion_id) REFERENCES discussion(id) ON DELETE CASCADE
+);
+
+--DODAVANJE NOVOG POLJA U USER TABELI
+ALTER TABLE user
+ADD COLUMN is_first_login BOOLEAN DEFAULT TRUE;
