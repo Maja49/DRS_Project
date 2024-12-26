@@ -10,21 +10,26 @@ services:
       - "3307:3306"  # koristi port 3307 na localhostu, a 3306 unutar kontejnera
     networks:
       - app-network
+    volumes:
+      - mysql-data:/var/lib/mysql  # Dodajte volumen za trajno čuvanje podataka
 
   backend:
-    build: ./backend
+    build: ./backend  # Ako imate Dockerfile u 'backend' direktorijumu
     environment:
-      - DB_HOST=db
+      - DB_HOST=db  # Koristimo 'db' kao ime servisa iz docker-compose.yml
       - DB_USER=root
       - DB_PASSWORD=2310
       - DB_NAME=drs
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      - db  # Obezbeđuje da se backend pokreće nakon što je db dostupan
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql-data:
