@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 2310
+      MYSQL_DATABASE: drs
+    ports:
+      - "3307:3306"  # koristi port 3307 na localhostu, a 3306 unutar kontejnera
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=2310
+      - DB_NAME=drs
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

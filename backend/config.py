@@ -1,9 +1,13 @@
-#da bismo se povezali sa bazom uz pomoc SQLAlchemy
-DB_HOST = 'localhost'
-DB_USER = 'root'  # Zameniti svojim korisničkim imenom
-DB_PASSWORD = '2310'  # Zameniti svojom šifrom
+# Konfiguracija za povezivanje sa bazom putem SQLAlchemy
+DB_HOST = 'db'  # Ime servisa baze u docker-compose.yml (ne localhost)
+DB_USER = 'root'  # Korisničko ime baze
+DB_PASSWORD = '2310'  # Lozinka za bazu
 DB_NAME = 'drs'  # Naziv tvoje baze
+
+# Flask konfiguracije
 SECRET_KEY = 'a#4h!r3d89D09$2faHf!sd83F@#s'  # Tajni ključ za Flask aplikaciju
+
+# Postavke za slanje emailova
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 587
 MAIL_USE_TLS = True
