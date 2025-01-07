@@ -7,23 +7,29 @@ services:
       MYSQL_ROOT_PASSWORD: 2310
       MYSQL_DATABASE: drs
     ports:
-      - "3307:3306"  # koristi port 3307 na localhostu, a 3306 unutar kontejnera
+      - "3307:3306"  # Localhost port 3307 maps to container's port 3306
     networks:
       - app-network
     volumes:
-      - mysql-data:/var/lib/mysql  # Dodajte volumen za trajno čuvanje podataka
+      - mysql-data:/var/lib/mysql
+    healthcheck:  # Ensure MySQL is ready before backend starts
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   backend:
-    build: ./backend  # Ako imate Dockerfile u 'backend' direktorijumu
+    build: ./backend  # Dockerfile must be in the `backend` directory
     environment:
-      - DB_HOST=db  # Koristimo 'db' kao ime servisa iz docker-compose.yml
-      - DB_USER=root
-      - DB_PASSWORD=2310
-      - DB_NAME=drs
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: 2310
+      DB_NAME: drs
     ports:
       - "5000:5000"
     depends_on:
-      - db  # Obezbeđuje da se backend pokreće nakon što je db dostupan
+      db:
+        condition: service_healthy  # Wait until the DB is ready
     networks:
       - app-network
 
