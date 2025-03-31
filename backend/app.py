@@ -16,7 +16,8 @@ CORS(app, origins="http://localhost:5173")
 # konfiguracija baze
 #uverivanje URL veze sa bazom = specifikacija za povezivanje baze pomocu pymsql drivera, ostali parametri su preuzeti iz configa
 # Povezivanje sa MySQL bazom
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@db/{config.DB_NAME}"
+# Umesto hardkodiranog URI-ja, koristi konfiguraciju iz config.py
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}/{config.DB_NAME}"
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:MySQLPassword1@mysql_db:3306/appDB'
 

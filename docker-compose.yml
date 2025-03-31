@@ -4,10 +4,11 @@ services:
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: 2310
-      MYSQL_DATABASE: drs
+      MYSQL_ROOT_PASSWORD: 2310  # Lozinka za root korisnika
+      MYSQL_DATABASE: drs  # Naziv baze
     ports:
-      - "3307:3306"  # Localhost port 3307 maps to container's port 3306
+      - "3307:3306"
+
     networks:
       - app-network
     volumes:
