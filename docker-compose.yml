@@ -2,41 +2,40 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:5.7
+    image: mysql:8.0
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 2310  # Lozinka za root korisnika
-      MYSQL_DATABASE: drs  # Naziv baze
+      MYSQL_ROOT_PASSWORD: 2310
+      MYSQL_DATABASE: drs_clean
+      MYSQL_USER: drs_user
+      MYSQL_PASSWORD: drs_pass
     ports:
       - "3307:3306"
-
-    networks:
-      - app-network
     volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:  # Ensure MySQL is ready before backend starts
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - db_data:/var/lib/mysql
 
   backend:
-    build: ./backend  # Dockerfile must be in the `backend` directory
-    environment:
-      DB_HOST: db
-      DB_USER: root
-      DB_PASSWORD: 2310
-      DB_NAME: drs
+    build: ./backend
     ports:
       - "5000:5000"
+    environment:
+      DB_USER: drs_user
+      DB_PASSWORD: drs_pass
+      DB_HOST: db
+      DB_NAME: drs_clean
     depends_on:
-      db:
-        condition: service_healthy  # Wait until the DB is ready
-    networks:
-      - app-network
+      - db
 
-networks:
-  app-network:
-    driver: bridge
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # sprečava konflikte između hosta i kontejnera
+    command: npm run dev -- --host
+
 
 volumes:
-  mysql-data:
+  db_data:

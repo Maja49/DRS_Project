@@ -1,21 +1,19 @@
-# Odaberi baznu sliku sa Python-om
-FROM python:3.10
+# Koristimo službeni Python image
+FROM python:3.12-slim
 
-# Instaliraj netcat-traditional
-RUN apt-get update && apt-get install -y netcat-traditional
-
-# Postavi radni direktorijum
+# Setuj radni dir
 WORKDIR /app
 
-# Preuzmi wait-for-it skriptu unutar /app
-RUN wget -O /app/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
-    && chmod +x /app/wait-for-it.sh
+# Kopiraj requirements i instaliraj
+COPY requirements.txt .
 
-# Kopiraj sve fajlove u Docker container
-COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Instaliraj Python zavisnosti
-RUN pip install -r requirements.txt
+# Kopiraj ostatak koda
+COPY . .
 
-# Pokreni wait-for-it pre nego što startuje aplikaciju
-CMD ["/app/wait-for-it.sh", "db:3306", "--", "python", "app.py"]
+# Izloži port na kojem aplikacija radi
+EXPOSE 5000
+
+# Definiši komandu za pokretanje aplikacije
+CMD ["python", "app.py"]

@@ -13,7 +13,6 @@ auth_bp = Blueprint('auth', __name__)
 # Ruta za registraciju
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    # Uzimanje podataka iz JSON zahteva
     name = request.json.get('name')
     lastname = request.json.get('lastname')
     adress = request.json.get('adress')
@@ -32,7 +31,6 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({"message": "Email already exists"}), 400
 
-    # Kreiranje novog korisnika
     new_user = User(
         name=name,
         lastname=lastname,
@@ -47,11 +45,17 @@ def register():
         is_approved=is_approved,
     )
 
-    # Dodavanje korisnika u bazu
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "User registered successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error during registration: {e}")  # Ispis u log
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
-    return jsonify({"message": "User registered successfully"}), 201
+
+    #return jsonify({"message": "User registered successfully"}), 201
 # endregion
 
 
