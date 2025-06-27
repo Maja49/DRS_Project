@@ -24,3 +24,4 @@ class Comment(db.Model):
         self.mentioned_user_id = mentioned_user_id
 
     def __repr__(self):        return f'<Comment {self.id}, User {self.user_id}, Mentioned User {self.mentioned_user_id}>'
+
