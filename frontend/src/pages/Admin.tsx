@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Admin.css"; // Dodaj stilove za tabelu po potrebi
 
 interface User {
