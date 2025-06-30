@@ -85,25 +85,24 @@ export const Discussion: React.FC<DiscussionProps> = ({
     fetchUsers();
   }, [comments]); // Učitava kada se komentari promene
   useEffect(() => {
+    fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => setComments(data))
+      .catch((error) => console.error("Error fetching comments:", error));
+  }, [id]);
+
+  useEffect(() => {
     // Fetch user details based on user_id
     fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
       .then((response) => response.json())
       .then((data) => setUser(data))
       .catch((error) => console.error("Error fetching user data:", error));
-
-    // Fetch comments for this discussion when comment section is visible
-    if (isCommentSectionVisible) {
-      fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => setComments(data))
-        .catch((error) => console.error("Error fetching comments:", error));
-    }
-  }, [isCommentSectionVisible, id, user_id]);
+  }, [user_id]);
 
   const handleDelete = () => {
     console.log("Fetching data for id diss:", id);
@@ -341,7 +340,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
                 setIsCommentSectionVisible(!isCommentSectionVisible)
               }
             >
-              💬
+              💬 {comments.length}
             </button>
           </div>
         </>
