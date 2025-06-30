@@ -144,45 +144,42 @@ def get_comments_by_discussion(discussion_id):
 # region deleting comment
 @comment_bp.route('/deletecomment/<int:comment_id>', methods=['DELETE'])
 def delete_comment(comment_id):
-    # Provera tokena iz Authorization zaglavlju
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Authorization token is missing"}), 401
 
     try:
-        # Ekstrakcija tokena (uklanjanje "Bearer " prefiksa)
         token = token.split()[1]
     except IndexError:
         return jsonify({"message": "Invalid token format"}), 400
 
-    # Validacija i dekodovanje tokena
     decoded = decode_token(token)
     if "error" in decoded:
         return jsonify({"message": decoded["error"]}), 403
 
-    user_id = decoded.get('user_id')  # Izvlačenje ID korisnika iz tokena
+    user_id = decoded.get('user_id')
     if not user_id:
         return jsonify({"message": "User ID not found in token"}), 403
 
-    # Proveri korisnika
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    # Pretraga komentara
     comment = Comment.query.get(comment_id)
     if not comment:
         return jsonify({"message": "Comment not found"}), 404
 
-    # Proveravamo kojoj diskusiji komentar pripada
     discussion = Discussion.query.get(comment.discussion_id)
     if not discussion:
         return jsonify({"message": "Discussion not found"}), 404
 
-    # Korisnik može da obriše komentar ako je autor diskusije ili ako je autor komentara
     if user.is_admin == 1 or user_id == comment.user_id or user_id == discussion.user_id:
         try:
-            db.session.delete(comment)  # Brisanje komentara
+            # 🔥 Prvo obriši sve povezane veze iz tabele CommentDiscussion
+            CommentDiscussion.query.filter_by(comment_id=comment_id).delete()
+
+            # Zatim obriši sam komentar
+            db.session.delete(comment)
             db.session.commit()
             return jsonify({"message": "Comment deleted successfully"}), 200
         except Exception as e:

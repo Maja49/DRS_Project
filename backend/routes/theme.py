@@ -90,12 +90,32 @@ def delete_theme(theme_id):
         return jsonify({"message": "Theme not found"}), 404
 
     try:
+        from models.discussion import Discussion
+        from models.comment import Comment
+        from models.likeDislike import LikeDislike
+
+        # Sve diskusije koje pripadaju ovoj temi
+        discussions = Discussion.query.filter_by(theme_id=theme_id).all()
+
+        for discussion in discussions:
+            # Prvo brišemo komentare vezane za ovu diskusiju
+            db.session.query(Comment).filter_by(discussion_id=discussion.id).delete()
+
+            # Zatim brišemo lajkove/dislajkove
+            db.session.query(LikeDislike).filter_by(discussion_id=discussion.id).delete()
+
+            # Na kraju brišemo diskusiju
+            db.session.delete(discussion)
+
+        # Brišemo samu temu
         db.session.delete(theme)
         db.session.commit()
         return jsonify({"message": "Theme deleted successfully."}), 200
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
+
 
 # Lista svih tema
 @theme_bp.route('/list', methods=['GET'])
