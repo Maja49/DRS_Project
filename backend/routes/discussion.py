@@ -278,10 +278,13 @@ def like_dislike_discussion(discussion_id):
     discussion.likes = LikeDislike.query.filter_by(discussion_id=discussion_id, action='like').count()
     discussion.dislikes = LikeDislike.query.filter_by(discussion_id=discussion_id, action='dislike').count()
 
-    # Spremi promene u bazu
+    # Spremi promene u bazu -izmenjeno 
     try:
         db.session.commit()
-        return jsonify({"message": f"Successfully {action}d the discussion"}), 200
+        return jsonify({
+            "likes": discussion.likes,
+            "dislikes": discussion.dislikes
+        }), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500

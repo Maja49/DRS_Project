@@ -39,6 +39,8 @@ export const Discussion: React.FC<DiscussionProps> = ({
   user_id,
   onDelete,
 }) => {
+  const currentUserId = Number(localStorage.getItem("user_id"));
+ 
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
@@ -60,6 +62,11 @@ export const Discussion: React.FC<DiscussionProps> = ({
   });
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
+
+     console.log("currentUserId:", currentUserId);
+  console.log("Discussion author user_id:", user_id);
+  comments.forEach((c: Comment) => console.log("Comment user_id:", c.user_id));
+
 
   const getUserById = (userId: number | string): Promise<string> => {
     return fetch(`http://localhost:5000/api/user/get_user/${userId}`)
@@ -175,36 +182,12 @@ export const Discussion: React.FC<DiscussionProps> = ({
       const data = await response.json();
 
       if (response.ok) {
-        if (action === "like") {
-          // Ako korisnik ponovo lajkuje, undo
-          if (hasLiked) {
-            setLikes(likes - 1);
-            setHasLiked(false);
-          } else {
-            setLikes(likes + 1);
-            setHasLiked(true);
-
-            if (hasDisliked) {
-              setDislikes(dislikes - 1);
-              setHasDisliked(false);
-            }
-          }
-        } else if (action === "dislike") {
-          // Ako korisnik ponovo dislajkuje, undo
-          if (hasDisliked) {
-            setDislikes(dislikes - 1);
-            setHasDisliked(false);
-          } else {
-            setDislikes(dislikes + 1);
-            setHasDisliked(true);
-
-            if (hasLiked) {
-              setLikes(likes - 1);
-              setHasLiked(false);
-            }
-          }
-        }
-      } else {
+        setLikes(data.likes);
+        setDislikes(data.dislikes);
+        setHasLiked(action === "like");
+        setHasDisliked(action === "dislike");
+    }
+     else {
         console.error(data.message || "An error occurred.");
       }
     } catch (error) {
@@ -250,7 +233,9 @@ export const Discussion: React.FC<DiscussionProps> = ({
         const data = await response.json();
 
         if (response.ok) {
-          setComments([...comments, data]); // odmah prikaži komentar
+          fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+          .then(res => res.json())
+          .then(data => setComments(data));
           setNewComment({ ...newComment, text: "" });
         } else {
           console.error("Error adding comment:", data.message);
@@ -291,7 +276,9 @@ export const Discussion: React.FC<DiscussionProps> = ({
       );
 
       if (response.ok) {
-        setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
+          fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+            .then(res => res.json())
+            .then(data => setComments(data));
         console.log("Comment deleted successfully");
       } else {
         const data = await response.json();
@@ -399,18 +386,19 @@ export const Discussion: React.FC<DiscussionProps> = ({
             <div className="comments-list">
               {comments.length > 0 ? (
                 comments.map((comment, index) => (
-                  <div key={comment.comment_id} className="comment">
+                    <div key={comment.comment_id || index} className="comment">
                     <p>
-                      <strong>{users[index] || "loading.."}</strong>:{" "}
-                      {comment.text}
+                      <strong>{users[index] || 'loading..'}</strong>: {comment.text}
                     </p>
-                    <button
-                      className="delete-comment-button"
-                      data-id={comment.comment_id}
-                      onClick={() => handleDeleteComment(comment.comment_id)}
-                    >
-                      🗑️ Delete
-                    </button>
+
+                    {(comment.user_id === currentUserId || user_id === currentUserId) && (
+                      <button
+                        className="delete-comment-button"
+                        onClick={() => handleDeleteComment(comment.comment_id)}
+                      >
+                        🗑️ Delete
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (

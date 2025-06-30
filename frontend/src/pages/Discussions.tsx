@@ -92,7 +92,7 @@ const Discussion: React.FC<DiscussionProps> = ({
    
        // Fetch comments for this discussion when comment section is visible
        if (isCommentSectionVisible) {
-         fetch(`http://localhost:5000/api/comment/getcomments//${id}`)
+         fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
            .then((response) => {
              if (!response.ok) {
                throw new Error(`HTTP error! status: ${response.status}`);
