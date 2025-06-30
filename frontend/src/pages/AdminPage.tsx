@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./AdminPage.css";
 import "./Discussion";
@@ -47,6 +48,7 @@ const AdminPage: React.FC = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostText, setNewPostText] = useState("");
   const [newPostTheme, setNewPostTheme] = useState("");
+  const navigate = useNavigate();
 
   function getUsernameFromToken(): string {
     const token = localStorage.getItem("auth_token"); // JWT token iz localStorage
@@ -218,7 +220,7 @@ const AdminPage: React.FC = () => {
   };
 
   const handleEdit = () => {
-    window.location.href = "/user";
+    navigate("/user");
   };
 
   ////////teme i duskusije///////////
@@ -236,7 +238,7 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const handleDiscussions = () => {
-    window.location.href = "/Discussions"; // Redirect to discussions page
+    navigate("/Discussions"); // Redirect to discussions page
   };
 
   const handleAddPost = () => {
@@ -375,10 +377,7 @@ const AdminPage: React.FC = () => {
       <nav className="navbar">
         <div className="navbar-left">
           <img src="/icon.png" alt="Logo" className="logo" />
-          <h1
-            className="app-name"
-            onClick={() => (window.location.href = "/admin")}
-          >
+          <h1 className="app-name" onClick={() => navigate("/admin")}>
             Chatify
           </h1>
         </div>
@@ -386,7 +385,7 @@ const AdminPage: React.FC = () => {
           <div className="search-container">
             <input
               type="text"
-              placeholder="Search by Theme Name, Email, etc."
+              placeholder="Search... by Theme Name, Email, etc."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {

@@ -96,10 +96,11 @@ def comment_discussion(discussion_id):
         db.session.commit()
 
         return jsonify({
-            "message": "Comment added successfully",
             "comment_id": new_comment.id,
-            "discussion_id": discussion_id,
-            "mentioned_user_id": mentioned_user_id
+            "user_id": new_comment.user_id,
+            "text": new_comment.text,
+            "mentioned_user_id": new_comment.mentioned_user_id,
+            "discussion_id": new_comment.discussion_id
         }), 201
     except Exception as e:
         db.session.rollback()

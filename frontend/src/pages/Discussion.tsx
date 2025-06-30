@@ -7,7 +7,7 @@ interface User {
 }
 
 interface Comment {
-  id: number;
+  comment_id: number;
   user_id: number;
   text: string;
   mentioned_user_id?: number | null;
@@ -24,6 +24,7 @@ export interface DiscussionProps {
   likes: number;
   dislikes: number;
   user_id: number;
+  onDelete?: (id: number) => void;
 }
 
 export const Discussion: React.FC<DiscussionProps> = ({
@@ -36,6 +37,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
   likes: initialLikes,
   dislikes: initialDislikes,
   user_id,
+  onDelete,
 }) => {
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
@@ -43,16 +45,14 @@ export const Discussion: React.FC<DiscussionProps> = ({
   const [hasDisliked, setHasDisliked] = useState<boolean>(false);
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [users, setUsers] = useState<string[]>([]);
-
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editedText, setEditedText] = useState<string>(text);
   const [editedTitle, setEditedTitle] = useState<string>(title);
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
-
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<Comment>({
-    id: 0,
+    comment_id: 0,
     user_id: 0,
     text: "",
     mentioned_user_id: null,
@@ -107,7 +107,6 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
   const handleDelete = () => {
     console.log("Fetching data for id diss:", id);
-
     const token = localStorage.getItem("auth_token");
 
     fetch(`http://localhost:5000/api/discussion/delete/${id}`, {
@@ -120,6 +119,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
       .then((response) => {
         if (response.ok) {
           console.log("Discussion deleted successfully");
+          onDelete?.(id);
           window.location.reload(); // Reload discussions
         } else {
           console.error("Error deleting discussion");
@@ -224,8 +224,14 @@ export const Discussion: React.FC<DiscussionProps> = ({
     e
   ) => {
     e.preventDefault();
-    const discussionId = e.currentTarget.dataset.id;
-    if (discussionId && newComment.text.trim() !== "") {
+    const discussionId = Number(e.currentTarget.dataset.id);
+
+    if (!discussionId || isNaN(discussionId)) {
+      console.error("Invalid discussionId");
+      return;
+    }
+
+    if (newComment.text.trim() !== "") {
       try {
         const response = await fetch(
           `http://localhost:5000/api/comment/comment/${discussionId}`,
@@ -241,11 +247,12 @@ export const Discussion: React.FC<DiscussionProps> = ({
             }),
           }
         );
+
         const data = await response.json();
 
         if (response.ok) {
-          setComments([...comments, data]); // Add the new comment to the comments list
-          setNewComment({ ...newComment, text: "" }); // Clear the input field
+          setComments([...comments, data]); // odmah prikaži komentar
+          setNewComment({ ...newComment, text: "" });
         } else {
           console.error("Error adding comment:", data.message);
         }
@@ -257,12 +264,13 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
   const handleCancelComment = () => {
     setNewComment({
-      id: 0,
+      comment_id: 0,
       user_id: 0,
       text: "",
       mentioned_user_id: null,
       discussion_id: 0,
     });
+    setIsCommentSectionVisible(false);
   };
 
   const handleDeleteComment = async (commentId: number) => {
@@ -284,9 +292,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
       );
 
       if (response.ok) {
-        setComments((prevComments) =>
-          prevComments.filter((comment) => comment.id !== commentId)
-        );
+        setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
         console.log("Comment deleted successfully");
       } else {
         const data = await response.json();
@@ -394,17 +400,15 @@ export const Discussion: React.FC<DiscussionProps> = ({
             <div className="comments-list">
               {comments.length > 0 ? (
                 comments.map((comment, index) => (
-                  <div key={comment.id} className="comment">
+                  <div key={comment.comment_id} className="comment">
                     <p>
                       <strong>{users[index] || "loading.."}</strong>:{" "}
                       {comment.text}
                     </p>
                     <button
                       className="delete-comment-button"
-                      data-id={comment.id}
-                      onClick={() =>
-                        comment.id && handleDeleteComment(comment.id)
-                      }
+                      data-id={comment.comment_id}
+                      onClick={() => handleDeleteComment(comment.comment_id)}
                     >
                       🗑️ Delete
                     </button>

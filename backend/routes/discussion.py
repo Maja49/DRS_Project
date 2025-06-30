@@ -213,6 +213,8 @@ def delete_discussion(discussion_id):
         comments = Comment.query.filter_by(discussion_id=discussion_id).all()
         for comment in comments:
             db.session.delete(comment)
+            
+        LikeDislike.query.filter_by(discussion_id=discussion_id).delete()
 
         db.session.delete(discussion)
         db.session.commit()
