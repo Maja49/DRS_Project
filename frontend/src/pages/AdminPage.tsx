@@ -207,20 +207,23 @@ const AdminPage: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault(); // Sprečava osvežavanje stranice
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim() === "") {
+        fetchDiscussions();
+      } else {
+        handleSearch(searchQuery);
+      }
+    }, 400);
 
-    const queryParams: { [key: string]: string } = {};
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
 
-    // Dodaj parametar u queryParams objekat
-    if (searchQuery.trim()) {
-      queryParams.theme_name = searchQuery.trim(); // Ovdje se može menjati parametar u zavisnosti od unosa
-    }
-
-    // Kreiraj URL sa parametrima
-    const queryString = new URLSearchParams(queryParams).toString();
-    const url = queryString
-      ? `http://localhost:5000/api/discussion/search?${queryString}`
+  const handleSearch = (query: string) => {
+    const url = query.trim()
+      ? `http://localhost:5000/api/discussion/search?q=${encodeURIComponent(
+          query
+        )}`
       : `http://localhost:5000/api/discussion/get_all`;
 
     // Fetch zahteva za pretragu
@@ -232,19 +235,12 @@ const AdminPage: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("Search Results:", data);
         setDiscussions(data); // Postavi rezultate pretrage
       })
       .catch((error) => {
         console.error("Error fetching search results:", error);
       });
   };
-
-  // const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-  //   if (e.key === "Enter") {
-  //     handleSearch(e);
-  //   }
-  // };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -431,11 +427,6 @@ const AdminPage: React.FC = () => {
               placeholder="Search... by Theme Name, Email, etc."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch(e);
-                }
-              }}
               className="search-input"
             />
             <img src="/search.png" alt="Search Icon" className="search-icon" />
