@@ -38,6 +38,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   user_id,
 }) => {
   const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
+  const currentUserId = Number(localStorage.getItem("user_id"));
 
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
@@ -76,41 +77,39 @@ const Discussion: React.FC<DiscussionProps> = ({
       });
   }
 
-  const handleAction = (action: "like" | "dislike") => {
-    fetch(`http://localhost:5000/api/discussion/like_dislike/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-      },
-      body: JSON.stringify({ action }),
+ const handleAction = (action: "like" | "dislike") => {
+  fetch(`http://localhost:5000/api/discussion/like_dislike/${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+    },
+    body: JSON.stringify({ action }),
+  })
+    .then(async (response) => {
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Backend error:", data.message);
+        return;
+      }
+
+      // OVDE se ažurira broj iz backend odgovora
+      setLikes(data.likes);
+      setDislikes(data.dislikes);
+
+      if (userAction === action) {
+        setUserAction(null); // undo
+      } else {
+        setUserAction(action);
+      }
+        fetchDiscussions();
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          // Ažuriraj UI samo za ovu diskusiju
-          if (userAction === action) {
-            // Ako je isti akcija, poništi
-            if (action === "like") setLikes((prev) => prev - 1);
-            if (action === "dislike") setDislikes((prev) => prev - 1);
-            setUserAction(null);
-          } else {
-            // Ako je druga akcija, poništi staru i postavi novu
-            if (userAction === "like") setLikes((prev) => prev - 1);
-            if (userAction === "dislike") setDislikes((prev) => prev - 1);
-  
-            if (action === "like") setLikes((prev) => prev + 1);
-            if (action === "dislike") setDislikes((prev) => prev + 1);
-  
-            setUserAction(action);
-          }
-        } else {
-          console.error("Error updating like/dislike:", data.message);
-        }
-      })
-      .catch((error) => console.error("Error in like/dislike action:", error));
-  };
-  
+    .catch((error) => {
+      console.error("Network or server error:", error);
+    });
+};
+
 
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
@@ -147,7 +146,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
     // Fetch comments for this discussion when comment section is visible
     if (isCommentSectionVisible) {
-      fetch(`http://localhost:5000/api/comment/getcomments//${id}`)
+      fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -220,6 +219,7 @@ const Discussion: React.FC<DiscussionProps> = ({
         if (response.ok) {
           setComments([...comments, data]); // Add the new comment to the comments list
           setNewComment({ ...newComment, text: "" }); // Clear the input field
+          fetchDiscussions(); //Za odma ispravno ispisan komentar
         } else {
           console.error("Error adding comment:", data.message);
         }
