@@ -238,6 +238,13 @@ const AdminPage: React.FC = () => {
   };
 
   ////////teme i duskusije///////////
+  const fetchDiscussions = () => {
+    fetch("http://localhost:5000/api/discussion/get_all")
+      .then((response) => response.json())
+      .then((data) => setDiscussions(data.discussions))
+      .catch((error) => console.error("Error fetching discussions:", error));
+  };
+
   useEffect(() => {
     // Učitavamo sve teme sa servera
     fetch("http://localhost:5000/api/discussion/themes")
@@ -245,14 +252,18 @@ const AdminPage: React.FC = () => {
       .then((data) => setThemes(data)) // Postavljamo teme u state
       .catch((error) => console.error("Error fetching themes:", error));
 
-    fetch("http://localhost:5000/api/discussion/get_all")
-      .then((response) => response.json())
-      .then((data) => setDiscussions(data.discussions))
-      .catch((error) => console.error("Error fetching discussions:", error));
+    fetchDiscussions();
   }, []);
 
   const handleDiscussions = () => {
     setActiveTab("my-discussions");
+
+    setTimeout(() => {
+      const adminPageDiv = document.querySelector(".admin-page");
+      if (adminPageDiv) {
+        adminPageDiv.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }, 0);
   };
 
   const handleAddPost = () => {
@@ -503,7 +514,11 @@ const AdminPage: React.FC = () => {
           <div className="discussion-space">
             {myDiscussions.length > 0 ? (
               myDiscussions.map((discussion) => (
-                <Discussion key={discussion.id} {...discussion} />
+                <Discussion
+                  key={discussion.id}
+                  {...discussion}
+                  onUpdate={() => fetchDiscussions()}
+                />
               ))
             ) : (
               <p>You haven't created any discussions yet.</p>
@@ -517,7 +532,11 @@ const AdminPage: React.FC = () => {
             <div className="discussions-section">
               {discussions.length > 0 ? (
                 discussions.map((discussion) => (
-                  <Discussion key={discussion.id} {...discussion} />
+                  <Discussion
+                    key={discussion.id}
+                    {...discussion}
+                    onUpdate={() => fetchDiscussions()}
+                  />
                 ))
               ) : (
                 <p>No discussions available</p>
