@@ -52,6 +52,24 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      navigate("/Login", { replace: true }); // Ako nema tokena, idi na login i zameni istoriju
+      return;
+    }
+
+    // Blokiraj back dugme (da ne moze nazad na login)
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.go(1);
+    };
+
+    return () => {
+      window.onpopstate = null;
+    };
+  }, [navigate]);
+
+  useEffect(() => {
     const { username, userId } = getUserInfoFromToken();
     setUserId(userId);
     setUsername(username);
