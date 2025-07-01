@@ -5,7 +5,7 @@ services:
     plan: free
     dockerfilePath: backend/Dockerfile
     buildCommand: ""
-    startCommand: "python app.py"  # prilagodi ako se drugačije startuje backend
+    startCommand: "python app.py"
     envVars:
       - key: DB_USER
         value: drs_user
@@ -19,7 +19,7 @@ services:
     dependsOn:
       - drs-db
 
-  - type: service
+  - type: private_service
     name: drs-db
     env: docker
     plan: free
@@ -48,4 +48,3 @@ services:
     autoDeploy: true
     dependsOn:
       - drs-backend
-
