@@ -32,7 +32,7 @@ interface Theme {
 }
 
 const AdminPage: React.FC = () => {
-  const username = getUsernameFromToken();
+  const [username, setUsername] = useState<string>("Guest");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -48,21 +48,35 @@ const AdminPage: React.FC = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostText, setNewPostText] = useState("");
   const [newPostTheme, setNewPostTheme] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  function getUsernameFromToken(): string {
-    const token = localStorage.getItem("auth_token"); // JWT token iz localStorage
+  useEffect(() => {
+    const { username, userId } = getUserInfoFromToken();
+    setUserId(userId);
+    setUsername(username);
+  }, []);
+
+  const myDiscussions = discussions.filter(
+    (discussion) => discussion.user_id === userId
+  );
+
+  function getUserInfoFromToken(): { username: string; userId: number | null } {
+    const token = localStorage.getItem("auth_token");
     if (token) {
       try {
         const payloadBase64 = token.split(".")[1];
-        const decodedPayload = JSON.parse(atob(payloadBase64)); // Dekodiramo payload
-        return decodedPayload.username || "Guest"; // Vraćamo korisničko ime ili "Guest" ako nije dostupno
+        const decodedPayload = JSON.parse(atob(payloadBase64));
+        return {
+          username: decodedPayload.username || "Guest",
+          userId: decodedPayload.user_id || null,
+        };
       } catch (error) {
         console.error("Error decoding token:", error);
-        return "Guest"; // Ako nešto pođe po zlu, vraćamo "Guest"
+        return { username: "Guest", userId: null };
       }
     }
-    return "Guest"; // Ako token ne postoji
+    return { username: "Guest", userId: null };
   }
 
   // Dohvatanje zahtjeva za registraciju
@@ -238,7 +252,7 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const handleDiscussions = () => {
-    navigate("/Discussions"); // Redirect to discussions page
+    setActiveTab("my-discussions");
   };
 
   const handleAddPost = () => {
@@ -484,6 +498,18 @@ const AdminPage: React.FC = () => {
         </div>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+        {activeTab === "my-discussions" && (
+          <div className="discussion-space">
+            {myDiscussions.length > 0 ? (
+              myDiscussions.map((discussion) => (
+                <Discussion key={discussion.id} {...discussion} />
+              ))
+            ) : (
+              <p>You haven't created any discussions yet.</p>
+            )}
+          </div>
+        )}
 
         {activeTab === "discussion" && (
           <div className="discussion-space">

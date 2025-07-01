@@ -34,8 +34,8 @@ export const Discussion: React.FC<DiscussionProps> = ({
   theme_name,
   created_at,
   // updated_at,
-  likes: initialLikes,
-  dislikes: initialDislikes,
+  likes: initialLikes = 0,
+  dislikes: initialDislikes = 0,
   user_id,
   onDelete,
 }) => {
