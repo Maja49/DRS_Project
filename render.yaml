@@ -4,7 +4,6 @@ services:
     env: docker
     plan: free
     dockerfilePath: backend/Dockerfile
-    buildCommand: ""
     envVars:
       - key: DB_USER
         value: sql7787897
@@ -21,5 +20,4 @@ services:
     env: docker
     plan: free
     dockerfilePath: frontend/Dockerfile
-    buildCommand: ""
     autoDeploy: true
