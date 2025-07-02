@@ -7,7 +7,7 @@ interface User {
 }
 
 interface Comment {
-  id: number;
+  comment_id: number;
   user_id: number;
   text: string;
   mentioned_user_id?: number | null;
@@ -51,7 +51,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<Comment>({
-    id: 0,
+    comment_id: 0,
     user_id: 0,
     text: "",
     mentioned_user_id: null,
@@ -231,7 +231,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
   const handleCancelComment = () => {
     setNewComment({
-      id: 0,
+      comment_id: 0,
       user_id: 0,
       text: "",
       mentioned_user_id: null,
@@ -302,7 +302,7 @@ const Discussion: React.FC<DiscussionProps> = ({
             <div className="comments-list">
               {comments.length > 0 ? (
                 comments.map((comment, index) => (
-                  <div key={comment.id} className="comment">
+                  <div key={comment.comment_id} className="comment">
                     <p>
                       <strong>{users[index] || "loading.."}</strong>:{" "}
                       {comment.text}
