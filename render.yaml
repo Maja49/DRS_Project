@@ -5,7 +5,6 @@ services:
     plan: free
     dockerfilePath: backend/Dockerfile
     buildCommand: ""
-    startCommand: "python app.py"
     envVars:
       - key: DB_USER
         value: sql7787897
@@ -23,6 +22,4 @@ services:
     plan: free
     dockerfilePath: frontend/Dockerfile
     buildCommand: ""
-    startCommand: "npm run dev -- --host"
     autoDeploy: true
-    
