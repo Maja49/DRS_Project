@@ -143,48 +143,18 @@ const Discussion: React.FC<DiscussionProps> = ({
       .then((response) => response.json())
       .then((data) => setUser(data))
       .catch((error) => console.error("Error fetching user data:", error));
+  }, [id, user_id]);
 
-    // Fetch comments for this discussion when comment section is visible
-    if (isCommentSectionVisible) {
-      fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => setComments(data))
-        .catch((error) => console.error("Error fetching comments:", error));
-    }
-  }, [isCommentSectionVisible, id, user_id]);
-
-  const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(likes + 1);
-      if (hasDisliked) {
-        setDislikes(dislikes - 1);
-        setHasDisliked(false);
-      }
-      setHasLiked(true);
-    } else {
-      setLikes(likes - 1);
-      setHasLiked(false);
-    }
-  };
-
-  const handleDislike = () => {
-    if (!hasDisliked) {
-      setDislikes(dislikes + 1);
-      if (hasLiked) {
-        setLikes(likes - 1);
-        setHasLiked(false);
-      }
-      setHasDisliked(true);
-    } else {
-      setDislikes(dislikes - 1);
-      setHasDisliked(false);
-    }
-  };
+  // Učitavanje komentara (bez čekanja na klik)
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
+      .then((data) => setComments(data))
+      .catch((error) => console.error("Error fetching comments:", error));
+  }, [id]);
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment((prevComment) => ({
@@ -239,6 +209,39 @@ const Discussion: React.FC<DiscussionProps> = ({
     });
   };
 
+  const handleDeleteComment = async (commentId: number) => {
+          const token = localStorage.getItem("auth_token");
+
+          if (!token) {
+            alert("Not authorized");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `http://localhost:5000/api/comment/deletecomment/${commentId}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (response.ok) {
+              // osveži komentare
+              fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+                .then((res) => res.json())
+                .then((data) => setComments(data));
+            } else {
+              const data = await response.json();
+              console.error("Delete failed:", data.message);
+            }
+          } catch (error) {
+            console.error("Network error:", error);
+          }
+  };
+
   const formattedTime = created_at
     ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
     : "Invalid date";
@@ -269,7 +272,7 @@ const Discussion: React.FC<DiscussionProps> = ({
           className="comment-button"
           onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
         >
-          💬
+          💬 {comments.length}
         </button>
       </div>
 
@@ -301,14 +304,25 @@ const Discussion: React.FC<DiscussionProps> = ({
             {/* List of comments */}
             <div className="comments-list">
               {comments.length > 0 ? (
-                comments.map((comment, index) => (
-                  <div key={comment.comment_id} className="comment">
-                    <p>
-                      <strong>{users[index] || "loading.."}</strong>:{" "}
-                      {comment.text}
-                    </p>
-                  </div>
-                ))
+                comments.map((comment, index) => {
+                  const canDelete = Number(comment.user_id) === currentUserId || Number(user_id) === currentUserId;
+
+                  return (
+                    <div key={comment.comment_id ?? index} className="comment">
+                      <p>
+                        <strong>{users[index] || "loading.."}</strong>: {comment.text}
+                        {canDelete && (
+                          <button
+                            onClick={() => handleDeleteComment(comment.comment_id)}
+                            className="delete-comment-button"
+                          >
+                            🗑️ Delete
+                          </button>
+                        )}
+                      </p>
+                    </div>
+                  );
+                })
               ) : (
                 <p>No comments yet. Be the first to comment!</p>
               )}

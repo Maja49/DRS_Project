@@ -79,10 +79,11 @@ body, html {
   
   .search-container {
     position: relative;
-    width: 40%; 
-    height: 20px;
-    margin-top: -35px;
+    width: 40%;
+    height: 40px;
+    display: flex;
     align-items: center;
+    justify-content: center;
   }
   
   .search-input {
@@ -169,7 +170,9 @@ body, html {
   .username {
     font-size: 18px;
     color: #ffffff;
-    margin-top: -5px;
+    display: flex;
+    align-items: center;
+    height: 55px;
   }
   
   .dropdown-menu {
@@ -299,7 +302,7 @@ body, html {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 16px;
   color: #888;
   padding: 5px;
 }
@@ -359,6 +362,7 @@ body, html {
 
 .comments-list {
   margin-top: 10px;
+  width: 100%;
 }
 
 .comment {
@@ -368,6 +372,25 @@ body, html {
   border-radius: 5px;
   width: 100%;
   word-wrap: break-word;
+  text-align: left;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-comment-button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-left: auto
+}
+.delete-comment-button:hover {
+  color: darkred;
 }
 
 .modal {

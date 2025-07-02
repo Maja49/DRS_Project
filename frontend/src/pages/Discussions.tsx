@@ -37,15 +37,14 @@ const Discussion: React.FC<DiscussionProps> = ({
   dislikes: initialDislikes,
   user_id,
 }) => {
-  console.log("Discussion komponenta se renderuje, id:", id);
-
-  console.log("Jel se promenilo ista");
   const currentUserId = Number(localStorage.getItem("user_id")) || 0;
+  const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
+  
 
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
-  const [hasDisliked, setHasDisliked] = useState<boolean>(false);
+  const [userAction, setUserAction] = useState<"like" | "dislike" | null>(null);
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [users, setUsers] = useState<string[]>([]); 
 
@@ -100,7 +99,7 @@ const Discussion: React.FC<DiscussionProps> = ({
      
          fetchUsers();
        }, [comments]); // Učitava kada se komentari promene
-       useEffect(() => {
+    useEffect(() => {
          fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
            .then((response) => {
              if (!response.ok) {
@@ -110,16 +109,56 @@ const Discussion: React.FC<DiscussionProps> = ({
            })
            .then((data) => setComments(data))
            .catch((error) => console.error("Error fetching comments:", error));
-       }, [id]);
+    }, [id]);
 
-       useEffect(() => {
+    useEffect(() => {
            // Fetch user details based on user_id
            fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
              .then((response) => response.json())
              .then((data) => setUser(data))
              .catch((error) => console.error("Error fetching user data:", error));
-         }, [user_id]);
+    }, [user_id]);
 
+    const fetchDiscussions = () => {
+      fetch(`http://localhost:5000/api/discussion/get_by_user/${user_id}`)
+        .then((response) => response.json())
+        .then((data) => setDiscussions(data.discussions))
+        .catch((error) => console.error("Error fetching discussions:", error));
+    };
+
+         
+    const handleAction = (action: "like" | "dislike") => {
+      fetch(`http://localhost:5000/api/discussion/like_dislike/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+        body: JSON.stringify({ action }),
+      })
+        .then(async (response) => {
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error("Backend error:", data.message);
+            return;
+          }
+
+          // OVDE se ažurira broj iz backend odgovora
+          setLikes(data.likes);
+          setDislikes(data.dislikes);
+
+          if (userAction === action) {
+            setUserAction(null); // undo
+          } else {
+            setUserAction(action);
+          }
+            fetchDiscussions();
+        })
+        .catch((error) => {
+          console.error("Network or server error:", error);
+        });
+    };
     const handleDelete = () => {
       console.log("Fetching data for id diss:", id); 
 
@@ -168,33 +207,6 @@ const Discussion: React.FC<DiscussionProps> = ({
           .catch((error) => console.error("Error updating discussion:", error));
       };
       
-  const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(likes + 1);
-      if (hasDisliked) {
-        setDislikes(dislikes - 1);
-        setHasDisliked(false);
-      }
-      setHasLiked(true);
-    } else {
-      setLikes(likes - 1);
-      setHasLiked(false);
-    }
-  };
-
-  const handleDislike = () => {
-    if (!hasDisliked) {
-      setDislikes(dislikes + 1);
-      if (hasLiked) {
-        setLikes(likes - 1);
-        setHasLiked(false);
-      }
-      setHasDisliked(true);
-    } else {
-      setDislikes(dislikes - 1);
-      setHasDisliked(false);
-    }
-  };
 
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,14 +305,14 @@ return (
           <div className="discussion-text">{text}</div>
           <div className="discussion-actions">
             <button
-              className={`like-button ${hasLiked ? "active" : ""}`}
-              onClick={handleLike}
+              className={`like-button ${userAction === "like" ? "active" : ""}`}
+              onClick={() => handleAction("like")}
             >
               ❤️ {likes}
             </button>
             <button
-              className={`dislike-button ${hasDisliked ? "active" : ""}`}
-              onClick={handleDislike}
+              className={`dislike-button ${userAction === "dislike" ? "active" : ""}`}
+              onClick={() => handleAction("dislike")}
             >
               💔 {dislikes}
             </button>
