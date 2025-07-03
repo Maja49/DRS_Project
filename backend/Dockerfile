@@ -10,7 +10,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Kopiraj samo backend kod
-COPY backend/ .
+COPY . .
 
 # Izloži port na kojem aplikacija radi
 EXPOSE 5000
