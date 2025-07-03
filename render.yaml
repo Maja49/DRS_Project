@@ -21,4 +21,5 @@ services:
     env: docker
     plan: free
     dockerfilePath: frontend/Dockerfile
+    buildContextPath: frontend
     autoDeploy: true
