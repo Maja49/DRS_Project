@@ -398,9 +398,7 @@ const Home: React.FC = () => {
     e.preventDefault(); // Prevents page refresh
     console.log("Search started with query:", searchQuery);
     if (searchQuery.trim()) {
-      fetch(
-        `http://localhost:5000/api/discussion/search?theme_name=${searchQuery}`
-      )
+      fetch(`http://localhost:5000/api/discussion/search?q=${searchQuery}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
