@@ -1,14 +1,14 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Trebuchet MS', sans-serif;
-    background-image: url('background.jpg');
-    
-  }
-  /* Osnovne postavke za scroll bar */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Trebuchet MS", sans-serif;
+  background-image: url("background.jpg");
+}
+/* Osnovne postavke za scroll bar */
 ::-webkit-scrollbar {
-  width: 12px;  /* Širina scroll-bar-a */
+  width: 12px; /* Širina scroll-bar-a */
   height: 12px; /* Visina horizontalnog scroll-bar-a */
 }
 
@@ -28,263 +28,254 @@ body, html {
   background-color: #3b5a8b; /* Tamnija boja kada je u fokusu */
 }
 
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 15px;
-    background-color: #4a90e2;
-   /* background-color: rgb(255, 184, 126);*/
-    color: white;
-    position: fixed;
-    top: 0;
-    left: 0; 
-    width: 100%; 
-    height: 55px; 
-    z-index: 1000; /* Navbar iznad ostalih elemenata */
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Blaga senka */
-  }
-  
-  .navbar-left {
-    display: flex;
-    align-items: top;
-  }
-  
-  .logo {
-    display: inline-block;
-    width: auto;
-    height: auto;
-    margin-top: -30px;
-    margin-left: -30px;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: #4a90e2;
+  /* background-color: rgb(255, 184, 126);*/
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  z-index: 1000; /* Navbar iznad ostalih elemenata */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Blaga senka */
 }
 
+.navbar-left {
+  display: flex;
+  align-items: top;
+}
 
-  
-  .app-name {
-    font-size: 1.2rem; 
-    font-family: 'Trebuchet MS', sans-serif;
-    font-weight: bold;
-    margin-top: 7px;
-    margin-left: -15px;
-    color: white;
-  }
+.logo {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  margin-top: -30px;
+  margin-left: -30px;
+}
 
-  .navbar-center {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .search-container {
-    position: center;
-    width: 40%; 
-    height: 20px;
-    margin-top: -35px;
-    align-items: center;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 10px 40px 10px 20px;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.3s ease;
-    align-items: center;
-  }
-  
-  .search-input:focus {
-    border-color: #4CAF50;
-  }
-  
-  .search-input::placeholder {
-    color: #aaa;
-    transition: opacity 0.3s ease;
-  }
-  
-  .search-input:focus::placeholder {
-    opacity: 0; /* Nestaje placeholder kada korisnik kuca */
-  }
-  
-  .search-icon {
-    position: absolute;
-    top: 20px;
-    right: 10px;
-    transform: translateY(-50%);
-    color: #aaa;
-    font-size: 18px;
-  }
-  
-  .navbar-right {
-    display: flex;
-    align-items: center;
-  }
-  
-  .add-post-button {
-    position: relative; 
-    top: -14px; 
-    left: -40px; 
-    background-color: #ffffff; 
-    border: none;
-    padding: 7px 15px;
-    font-size: 0.9rem;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .add-post-button:hover {
-    background-color: #2737ed; 
-    color: white;
-  }
-  
-  .login-button {
-    background-color: #61dafb;
-    border: none;
-    padding: 5px 12px;
-    font-size: 0.9rem;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .login-button:hover {
-    background-color: #21a1f1;
-  }
-  
-  .profile-icon{
-    height: 50px;
-    width: 50px;
-    margin-bottom: 25px;
-    margin-right: -5px;
-  }
+.app-name {
+  font-size: 1.2rem;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: bold;
+  margin-top: 7px;
+  margin-left: -15px;
+  color: white;
+}
 
-  .profile-section {
-    position: relative;
-    cursor: pointer;
-    align-items: center; 
-  }
-  
-  .username {
-    font-size: 18px;
-    color: #ffffff;
-    margin-top: 10px;
-  }
-  
-  .dropdown-menu {
-    position: absolute;
-    top: 80%; 
-    right: -7px;
-    background-color: white;
-    color: black;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 150px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    display: none; 
-  }
-  
-  .profile-section:hover .dropdown-menu,
-  .profile-section .dropdown-menu.active {
-    display: block; 
-  }
-  
-  .dropdown-menu button {
-    width: 100%;
-    padding: 10px;
-    text-align: left;
-    background-color: transparent;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .dropdown-menu button:hover {
-    background-color: #f0f0f0;
-  }
+.navbar-center {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
 
- 
-  .discussions-section {
-    position: relative;
-    margin-top: 20px;
-    max-height: calc(100vh - 120px);  
-  }
-  
-  
-  
-  .discussion-card {
-    background-color: white;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 900px;
-    height: auto; 
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .discussion-header {
-    margin-bottom: -15px;
-    display: flex;
-    justify-content: space-between; 
-  }
-  
-  .topic {
-    font-size: 12px;
-    color: #6b6b6b;
-    text-align: left;
-  }
+.search-container {
+  position: center;
+  width: 40%;
+  height: 20px;
+  margin-top: -35px;
+  align-items: center;
+}
 
-  .user
-  {
-    font-size: 11px;
-    color: #888;
-    text-align: left;
-  }
-  .discussion-created {
-    font-size: 12px;
-    color: #888;
-    text-align: left;
-  }
-  
-  .discussion-title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: left;
-  }
-  
-  .discussion-author
-  {
-    text-align: left;
-    font-size: 12px;
-  }
-  .discussion-text {
-    font-size: 12px;
-    font-weight: bold;
-    line-clamp: 4;
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: normal; 
-    width: 100%; 
-    text-align: left;
-  }
-  
-  
-  .discussion-actions {
-    margin-top: 10px;
-    display: flex;
-    justify-content: flex-start;
-  }
-  
-  .like-button,
-  .dislike-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 10px;
-  }
-  
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 20px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.search-input:focus {
+  border-color: #4caf50;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+  transition: opacity 0.3s ease;
+}
+
+.search-input:focus::placeholder {
+  opacity: 0; /* Nestaje placeholder kada korisnik kuca */
+}
+
+.search-icon {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 18px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.add-post-button {
+  position: relative;
+  top: -14px;
+  left: -40px;
+  background-color: #ffffff;
+  border: none;
+  padding: 7px 15px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-post-button:hover {
+  background-color: #2737ed;
+  color: white;
+}
+
+.login-button {
+  background-color: #61dafb;
+  border: none;
+  padding: 5px 12px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #21a1f1;
+}
+
+.profile-icon {
+  height: 50px;
+  width: 50px;
+  margin-bottom: 25px;
+  margin-right: -5px;
+}
+
+.profile-section {
+  position: relative;
+  cursor: pointer;
+  align-items: center;
+}
+
+.username {
+  font-size: 18px;
+  color: #ffffff;
+  margin-top: 10px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 80%;
+  right: -7px;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 150px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.profile-section:hover .dropdown-menu,
+.profile-section .dropdown-menu.active {
+  display: block;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f0f0;
+}
+
+.discussions-section {
+  position: relative;
+  margin-top: 20px;
+  max-height: calc(100vh - 120px);
+}
+
+.discussion-card {
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 900px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.discussion-header {
+  margin-bottom: -15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.topic {
+  font-size: 12px;
+  color: #6b6b6b;
+  text-align: left;
+}
+
+.user {
+  font-size: 11px;
+  color: #888;
+  text-align: left;
+}
+.discussion-created {
+  font-size: 12px;
+  color: #888;
+  text-align: left;
+}
+
+.discussion-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.discussion-author {
+  text-align: left;
+  font-size: 12px;
+}
+.discussion-text {
+  font-size: 12px;
+  font-weight: bold;
+  line-clamp: 4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  width: 100%;
+  text-align: left;
+}
+
+.discussion-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.like-button,
+.dislike-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
 
 .comment-section {
   display: flex;
@@ -357,7 +348,7 @@ body, html {
 
 .comments-list {
   margin-top: 10px;
-  width: 100%;
+  width: 870px;
 }
 
 .comment {
@@ -371,13 +362,14 @@ body, html {
 }
 
 .delete-comment-button {
-  color: black;
+  background: none;
   border: none;
-  padding: 4px 8px;
+  color: red;
+  padding: 5px 10px;
   cursor: pointer;
   border-radius: 3px;
-  font-size: 12px;
-  margin-right: -5px;
+  margin-left: 10px;
+  align-self: flex-start;
 }
 
 .delete-comment-button:hover {
