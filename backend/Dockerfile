@@ -15,4 +15,5 @@ COPY backend/ .
 # Izloži port na kojem aplikacija radi
 EXPOSE 5000
 
-
+# Definiši komandu za pokretanje aplikacije
+CMD ["python", "app.py"]

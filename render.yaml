@@ -3,7 +3,8 @@ services:
     name: drs-backend
     env: docker
     plan: free
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: docker/backend.Dockerfile
+    startCommand: "python app.py"
     envVars:
       - key: DB_USER
         value: sql7787897
@@ -19,5 +20,6 @@ services:
     name: drs-frontend
     env: docker
     plan: free
-    dockerfilePath: frontend/Dockerfile
+    dockerfilePath: docker/frontend.Dockerfile
+    startCommand: "npm run preview -- --host"
     autoDeploy: true
