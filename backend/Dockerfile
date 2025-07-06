@@ -5,15 +5,14 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Kopiraj requirements i instaliraj
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Kopiraj samo backend kod
-COPY . .
+COPY backend/ .
 
 # Izloži port na kojem aplikacija radi
 EXPOSE 5000
 
-# Definiši komandu za pokretanje aplikacije
-CMD ["python", "app.py"]
+
