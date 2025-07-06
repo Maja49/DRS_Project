@@ -15,7 +15,7 @@ services:
       - db_data:/var/lib/mysql
 
   backend:
-    build: ./docker
+    build: ./backend
     ports:
       - "5000:5000"
     environment:
