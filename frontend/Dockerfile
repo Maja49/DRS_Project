@@ -1,21 +1,17 @@
-# frontend/Dockerfile
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies early to leverage Docker caching
-COPY package*.json ./
-RUN npm install
+COPY frontend/package*.json ./
 
-# Copy source code
+ENV NODE_ENV=development
+RUN npm install
+ENV NODE_ENV=production
+
 COPY frontend/ .
 
-# Build app
 RUN npm run build
 
-# Expose port used by Vite
 EXPOSE 5173
 
-# Start preview (production-like)
 CMD ["npm", "run", "preview", "--", "--host"]
