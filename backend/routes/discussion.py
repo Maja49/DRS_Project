@@ -382,19 +382,12 @@ def search_discussions():
             "id": discussion.id,
             "text": discussion.text,
             "title": discussion.title,
-            "theme": discussion.theme.name,
-            "user": {
-                "id": discussion.user_id,
-                "username": User.query.get(discussion.user_id).username,
-                "name": User.query.get(discussion.user_id).name,
-                "lastname": User.query.get(discussion.user_id).lastname,
-                "email": User.query.get(discussion.user_id).email
-            },
+            "theme_name": discussion.theme.name,
+            "user_id": discussion.user_id,        
             "likes": discussion.likes,
             "dislikes": discussion.dislikes,
-            "created_at": discussion.created_at  #Da bi upisalo vreme kako treba 
-
-        })
+            "created_at": discussion.created_at.isoformat() 
+    })
 
     return jsonify(results), 200
 # endregion

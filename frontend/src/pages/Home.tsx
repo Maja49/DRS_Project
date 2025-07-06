@@ -40,6 +40,11 @@ const Discussion: React.FC<DiscussionProps> = ({
   const [discussions, setDiscussions] = useState<DiscussionProps[]>([]);
   const currentUserId = Number(localStorage.getItem("user_id"));
 
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editedText, setEditedText] = useState<string>(text);
+  const [editedTitle, setEditedTitle] = useState<string>(title);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+  
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
@@ -57,6 +62,7 @@ const Discussion: React.FC<DiscussionProps> = ({
     mentioned_user_id: null,
     discussion_id: 0,
   });
+
 
   function fetchDiscussions() {
     console.log("Fetching discussions...");
@@ -242,40 +248,122 @@ const Discussion: React.FC<DiscussionProps> = ({
           }
   };
 
+  const handleSaveEdit = () => {
+        console.log("Fetching data for id diss:", id);
+      
+        const token = localStorage.getItem("auth_token"); // Retrieving the token from localStorage
+      
+        fetch(`http://localhost:5000/api/discussion/update/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, // Including the token in the Authorization header
+          },
+          body: JSON.stringify({ title: editedTitle, text: editedText }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              setIsEditing(false);
+              console.log("Discussion updated successfully");
+              window.location.reload(); // Refresh
+            } else {
+              console.error("Error updating discussion");
+            }
+          })
+          .catch((error) => console.error("Error updating discussion:", error));
+  };
+
+  const handleDeleteDiscussion = () => {
+      console.log("Fetching data for id diss:", id); 
+
+      const token = localStorage.getItem("auth_token"); 
+
+        fetch(`http://localhost:5000/api/discussion/delete/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`, 
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("Discussion deleted successfully");
+              window.location.reload(); // Reload discussions
+            } else {
+              console.error("Error deleting discussion");
+            }
+          })
+          .catch((error) => console.error("Error deleting discussion:", error));
+      };
+    
   const formattedTime = created_at
-    ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
+    ? formatDistanceToNow(new Date(created_at + "Z"), { addSuffix: true }) 
     : "Invalid date";
 
   return (
     <div className="discussion-card">
-      <div className="discussion-header">
-        <p className="topic">{theme_name}</p>
-        <p className="discussion-created">{formattedTime}</p>
-      </div>
-      <p className="user">posted by: {user?.username}</p>
-      <p className="discussion-title">{title}</p>
-      <div className="discussion-text">{text}</div>
-      <div className="discussion-actions">
-      <button
-          className={`like-button ${userAction === "like" ? "active" : ""}`}
-          onClick={() => handleAction("like")}
-        >
-          ❤️ {likes}
-        </button>
-        <button
-          className={`dislike-button ${userAction === "dislike" ? "active" : ""}`}
-          onClick={() => handleAction("dislike")}
-        >
-          💔 {dislikes}
-        </button>
-        <button
-          className="comment-button"
-          onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-        >
-          💬 {comments.length}
-        </button>
-      </div>
+      {!isEditing ? (
+        <>
+          <div className="discussion-header">
+            <p className="topic">{theme_name}</p>
+            <p className="discussion-created">{formattedTime}</p>
+            {user_id === currentUserId && (
+              <>
+                <button onClick={() => setShowDeleteConfirmation(true)}>🗑️ Delete</button>
+                <button onClick={() => setIsEditing(true)}>✏️ Edit</button>
+              </>
+            )}
+          </div>
+          <p className="user">posted by: {user?.username}</p>
+          <p className="discussion-title">{title}</p>
+          <div className="discussion-text">{text}</div>
+          <div className="discussion-actions">
+          <button
+              className={`like-button ${userAction === "like" ? "active" : ""}`}
+              onClick={() => handleAction("like")}
+            >
+              ❤️ {likes}
+            </button>
+            <button
+              className={`dislike-button ${userAction === "dislike" ? "active" : ""}`}
+              onClick={() => handleAction("dislike")}
+            >
+              💔 {dislikes}
+            </button>
+            <button
+              className="comment-button"
+              onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+            >
+              💬 {comments.length}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="edit-discussion">
+          <input
+            type="text"
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            placeholder="Edit title"
+          />
+          <textarea
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            placeholder="Edit text"
+          />
+          <button onClick={handleSaveEdit}>Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </div>
+      )}
 
+      {showDeleteConfirmation && (
+        <div className="delete-confirmation">
+          <p>Are you sure you want to delete this discussion?</p>
+          <button onClick={handleDeleteDiscussion}>Yes</button>
+          <button onClick={() => setShowDeleteConfirmation(false)}>No</button>
+        </div>
+      )}
+  
       <div className="comment-section">
         {isCommentSectionVisible && (
           <div>
@@ -443,6 +531,7 @@ const Home: React.FC = () => {
   const handleAddPost = () => {
     console.log();
     setIsAddPostModalVisible(true);
+     setDropdownVisible(false);
   };
 
   const handleSavePost = () => {
@@ -476,6 +565,7 @@ const Home: React.FC = () => {
           setNewPostTitle("");
           setNewPostText("");
           setNewPostTheme(""); // Resetovanje teme
+          window.location.reload();
         })
         .catch((error) => console.error("Error adding discussion:", error));
     } else {

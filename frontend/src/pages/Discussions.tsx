@@ -159,7 +159,7 @@ const Discussion: React.FC<DiscussionProps> = ({
           console.error("Network or server error:", error);
         });
     };
-    const handleDelete = () => {
+    const handleDeleteDiscussion = () => {
       console.log("Fetching data for id diss:", id); 
 
       const token = localStorage.getItem("auth_token"); 
@@ -346,7 +346,7 @@ return (
       {showDeleteConfirmation && (
         <div className="delete-confirmation">
           <p>Are you sure you want to delete this discussion?</p>
-          <button onClick={handleDelete}>Yes</button>
+          <button onClick={handleDeleteDiscussion}>Yes</button>
           <button onClick={() => setShowDeleteConfirmation(false)}>No</button>
         </div>
       )}
