@@ -13,7 +13,7 @@ from utils.token_utils import decode_token
 discussion_bp = Blueprint('discussion', __name__)
 
 # region get all
-@discussion_bp.route('/get_all', methods=['GET'])
+@discussion_bp.route('/get_all', methods=['GET', 'OPTIONS'])
 def get_all_discussions():
     try:
         # Query the database to get all discussions ordered by created_at from the oldest to the newest
@@ -45,7 +45,7 @@ def get_all_discussions():
 
 # region all themes
 # Ruta za dobijanje svih tema za popunjavanje padajućeg menija
-@discussion_bp.route('/themes', methods=['GET'])
+@discussion_bp.route('/themes', methods=['GET', 'OPTIONS'])
 def get_all_themes():
     themes = Theme.query.all()
     if not themes:
@@ -59,7 +59,7 @@ def get_all_themes():
 
 
 # region create discussion
-@discussion_bp.route('/create', methods=['POST'])
+@discussion_bp.route('/create', methods=['POST', 'OPTIONS'])
 def create_discussion():
     token = request.headers.get('Authorization')
 
@@ -124,7 +124,7 @@ def create_discussion():
 
 
 # region update discussion 
-@discussion_bp.route('/update/<int:discussion_id>', methods=['PUT'])
+@discussion_bp.route('/update/<int:discussion_id>', methods=['PUT', 'OPTIONS'])
 def update_discussion(discussion_id):
     token = request.headers.get('Authorization')
 
@@ -179,7 +179,7 @@ def update_discussion(discussion_id):
 
 
 # region delete discussion
-@discussion_bp.route('/delete/<int:discussion_id>', methods=['DELETE'])
+@discussion_bp.route('/delete/<int:discussion_id>', methods=['DELETE', 'OPTIONS'])
 def delete_discussion(discussion_id):
     token = request.headers.get('Authorization')
 
@@ -226,7 +226,7 @@ def delete_discussion(discussion_id):
 
 
 # region like_dislike
-@discussion_bp.route('/like_dislike/<int:discussion_id>', methods=['POST'])
+@discussion_bp.route('/like_dislike/<int:discussion_id>', methods=['POST', 'OPTIONS'])
 def like_dislike_discussion(discussion_id):
     # Uzmi token iz Authorization zaglavlja
     token = request.headers.get('Authorization')
@@ -292,7 +292,7 @@ def like_dislike_discussion(discussion_id):
 
 
 # region comment
-@discussion_bp.route('/comment/<int:discussion_id>', methods=['POST'])
+@discussion_bp.route('/comment/<int:discussion_id>', methods=['POST', 'OPTIONS'])
 def comment_discussion(discussion_id):
     # Provera tokena iz Authorization zaglavlja
     token = request.headers.get('Authorization')
@@ -352,7 +352,7 @@ def comment_discussion(discussion_id):
 
 
 # region search discussions
-@discussion_bp.route('/search', methods=['GET'])
+@discussion_bp.route('/search', methods=['GET', 'OPTIONS'])
 def search_discussions():
     query_param = request.args.get('q', '').strip()
     
@@ -393,7 +393,7 @@ def search_discussions():
 # endregion
 
 # region discussions by user -- dobijaju se sve diskusije odredjenog usera
-@discussion_bp.route('/get_by_user/<int:user_id>', methods=['GET'])
+@discussion_bp.route('/get_by_user/<int:user_id>', methods=['GET', 'OPTIONS'])
 def get_discussions_by_user(user_id):
     try:
         # Filter by user
