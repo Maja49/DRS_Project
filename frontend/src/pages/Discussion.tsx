@@ -113,7 +113,6 @@ export const Discussion: React.FC<DiscussionProps> = ({
   }, [user_id]);
 
   const handleDelete = () => {
-    console.log("Fetching data for id diss:", id);
     const token = localStorage.getItem("auth_token");
 
     fetch(`http://localhost:5000/api/discussion/delete/${id}`, {
@@ -125,9 +124,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
     })
       .then((response) => {
         if (response.ok) {
-          console.log("Discussion deleted successfully");
-          onDelete?.(id);
-          window.location.reload(); // Reload discussions
+          onDelete?.(id); // Obavesti roditelja da diskusija treba da se ukloni iz liste
         } else {
           console.error("Error deleting discussion");
         }
@@ -136,23 +133,20 @@ export const Discussion: React.FC<DiscussionProps> = ({
   };
 
   const handleSaveEdit = () => {
-    console.log("Fetching data for id diss:", id);
-
-    const token = localStorage.getItem("auth_token"); // Retrieving the token from localStorage
+    const token = localStorage.getItem("auth_token");
 
     fetch(`http://localhost:5000/api/discussion/update/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Including the token in the Authorization header
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ title: editedTitle, text: editedText }),
     })
       .then((response) => {
         if (response.ok) {
           setIsEditing(false);
-          console.log("Discussion updated successfully");
-          window.location.reload(); // Refresh
+          onUpdate?.(id); // Obavesti roditelja da diskusija treba da se osveži
         } else {
           console.error("Error updating discussion");
         }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import "./AdminPage.css";
 import "./Discussion";
@@ -37,7 +37,9 @@ const AdminPage: React.FC = () => {
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [themes, setThemes] = useState<Theme[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("requests");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") || "requests";
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
@@ -50,6 +52,10 @@ const AdminPage: React.FC = () => {
   const [newPostTheme, setNewPostTheme] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const changeTab = (tabName: string) => {
+    setActiveTab(tabName);
+    setSearchParams({ tab: tabName });
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -270,7 +276,7 @@ const AdminPage: React.FC = () => {
   }, []);
 
   const handleDiscussions = () => {
-    setActiveTab("my-discussions");
+    changeTab("my-discussions");
 
     setTimeout(() => {
       const adminPageDiv = document.querySelector(".admin-page");
@@ -493,25 +499,25 @@ const AdminPage: React.FC = () => {
         <div className="tabs">
           <button
             className={activeTab === "requests" ? "active" : ""}
-            onClick={() => setActiveTab("requests")}
+            onClick={() => changeTab("requests")}
           >
             Registration Requests
           </button>
           <button
             className={activeTab === "users" ? "active" : ""}
-            onClick={() => setActiveTab("users")}
+            onClick={() => changeTab("users")}
           >
             Approved Users
           </button>
           <button
             className={activeTab === "themes" ? "active" : ""}
-            onClick={() => setActiveTab("themes")}
+            onClick={() => changeTab("themes")}
           >
             Themes
           </button>
           <button
             className={activeTab === "discussion" ? "active" : ""}
-            onClick={() => setActiveTab("discussion")}
+            onClick={() => changeTab("discussion")}
           >
             Discussions
           </button>
@@ -527,6 +533,9 @@ const AdminPage: React.FC = () => {
                   key={discussion.id}
                   {...discussion}
                   onUpdate={() => fetchDiscussions()}
+                  onDelete={(id) =>
+                    setDiscussions(discussions.filter((d) => d.id !== id))
+                  }
                 />
               ))
             ) : (
@@ -545,6 +554,9 @@ const AdminPage: React.FC = () => {
                     key={discussion.id}
                     {...discussion}
                     onUpdate={() => fetchDiscussions()}
+                    onDelete={(id) =>
+                      setDiscussions(discussions.filter((d) => d.id !== id))
+                    }
                   />
                 ))
               ) : (
