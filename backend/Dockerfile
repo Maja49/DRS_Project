@@ -16,4 +16,5 @@ COPY . .
 EXPOSE 5000
 
 # Definiši komandu za pokretanje aplikacije
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:${PORT}", "wsgi:app"]
+
