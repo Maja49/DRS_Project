@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { MDBContainer } from "mdb-react-ui-kit";
 import "./SignUp.css";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +19,6 @@ const SignUp: React.FC = () => {
     username: "",
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const BASE_URL = import.meta.env.VITE_API_URL;
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
