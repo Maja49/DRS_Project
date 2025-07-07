@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Install dependencies early to leverage Docker caching
 COPY ./package*.json ./
+RUN ls -la /app
 RUN npm install
 
 # Copy source code
