@@ -14,7 +14,7 @@ services:
       - key: DB_NAME
         value: drs_postgres
       - key: DB_PORT
-        value: '5432'  # Port mora biti string u YAML-u
+        value: '5432'
       - key: SECRET_KEY
         value: a#4h!r3d89D09$2faHf!sd83F@#s
       - key: MAIL_SERVER
@@ -35,6 +35,4 @@ services:
     name: drs-frontend
     env: docker
     dockerfilePath: frontend/Dockerfile.render
-    buildCommand: ""
     plan: free
-    startCommand: "npm run preview -- --host"
