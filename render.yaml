@@ -19,7 +19,7 @@ services:
   - type: web
     name: drs-frontend
     env: docker
-    dockerfilePath: frontend/Dockerfile
+    dockerfilePath: frontend/Dockerfile.render
     buildCommand: ""
     startCommand: ""
     plan: free

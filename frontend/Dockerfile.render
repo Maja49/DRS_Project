@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Bitno: promenjena putanja jer je kontekst sad root projekta
-COPY frontend/package.json .
+COPY frontend/package*.json ./
 RUN npm install
 
 # Kopiraj ceo frontend folder
