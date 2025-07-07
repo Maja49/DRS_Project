@@ -25,8 +25,7 @@ CORS(app, origins="http://localhost:5173")
 # Konfiguracija baze
 #app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
-    "?sslmode=disable"
+    f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}?sslmode=require"
 )
 
 
@@ -78,7 +77,7 @@ def wait_for_db():
                 password=config.DB_PASSWORD,
                 host=config.DB_HOST,
                 port=config.DB_PORT,
-                sslmode="disable"
+                sslmode="require"
             )
             conn.close()
             print("Database is up!")
@@ -87,6 +86,7 @@ def wait_for_db():
             print(f"Database not ready, waiting... ({i+1}/30)\n{e}")
             time.sleep(1)
     raise Exception("Could not connect to the database after 30 attempts")
+
 
 
 
