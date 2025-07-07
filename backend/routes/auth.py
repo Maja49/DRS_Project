@@ -11,7 +11,7 @@ auth_bp = Blueprint('auth', __name__)
 
 # region registracija korisnickog naloga
 # Ruta za registraciju
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/register', methods=['POST', "OPTIONS"])
 def register():
     name = request.json.get('name')
     lastname = request.json.get('lastname')
@@ -63,6 +63,10 @@ def register():
 # Ruta za prijavu
 @auth_bp.route("/login", methods=["POST", "OPTIONS"])
 def login():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200 
+    
+    
     data = request.json
     email = request.json.get('email')
     password = request.json.get('password')
