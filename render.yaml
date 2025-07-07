@@ -3,8 +3,8 @@ services:
     name: drs-backend
     env: docker
     plan: free
-    dockerfilePath: backend/Dockerfile
     context: backend
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: DB_USER
         value: sql7787897

@@ -5,12 +5,12 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Kopiraj requirements i instaliraj
-COPY requirements.txt /app/
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Kopiraj samo backend kod
-COPY . /app/
+COPY . .
 
 # Izloži port na kojem aplikacija radi
 EXPOSE 5000
