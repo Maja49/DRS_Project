@@ -10,7 +10,7 @@ services:
       - key: DB_PASSWORD
         value: W8cjZ60GxXPhcRFblt4a3ViqgQNo26VD
       - key: DB_HOST
-        value: dpg-d1lttoer433s73e7dp40-a.render-postgres.render.amazonaws.com
+        value: dpg-d1lttoer433s73e7dp40-a.frankfurt-postgres.render.com
       - key: DB_NAME
         value: drs_postgres
       - key: DB_PORT
