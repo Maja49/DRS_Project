@@ -3,7 +3,7 @@ import { MDBContainer } from "mdb-react-ui-kit";
 import { jwtDecode } from "jwt-decode"; //  import
 import "./Login.css";
 
-const BASE_URL = import.meta.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 
 // Definisanje tipa za dekodirani token
@@ -30,7 +30,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}:5000/api/auth/login`, {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

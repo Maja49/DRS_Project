@@ -30,7 +30,7 @@ def index():
 # Konfiguracija baze
 #app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}?sslmode=require"
+    f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}?sslmode=disable"
 )
 
 
@@ -82,7 +82,7 @@ def wait_for_db():
                 password=config.DB_PASSWORD,
                 host=config.DB_HOST,
                 port=config.DB_PORT,
-                sslmode="require"
+                sslmode="disable"
             )
             conn.close()
             print("Database is up!")
