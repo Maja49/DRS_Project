@@ -4,8 +4,7 @@ services:
     env: docker
     plan: free
     dockerfilePath: backend/Dockerfile
-    context: backend             # ⬅⬅⬅ OVA LINIJA JE KLJUČNA
-    startCommand: "python app.py"
+    context: backend
     envVars:
       - key: DB_USER
         value: sql7787897
@@ -22,6 +21,5 @@ services:
     env: docker
     plan: free
     dockerfilePath: frontend/Dockerfile
-    context: frontend            # ⬅⬅⬅ Dodaj i ovde za frontend
-    startCommand: "npm run preview -- --host"
+    context: frontend
     autoDeploy: true
