@@ -1,6 +1,8 @@
+const BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "") || "http://localhost:5000";
+
 export const updateUser = async (userData: Record<string, any>) => {
   try {
-    const response = await fetch("http://localhost:5000/api/users/update", {
+    const response = await fetch(`${BASE_URL}/users/update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

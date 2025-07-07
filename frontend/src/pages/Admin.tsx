@@ -21,7 +21,7 @@ const Admin: React.FC = () => {
     // Fetch za korisnike
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/users`); // Backend ruta za dohvat korisnika
+        const response = await fetch(`${BASE_URL}/admin/users`); // Backend ruta za dohvat korisnika
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }

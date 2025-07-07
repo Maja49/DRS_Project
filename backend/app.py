@@ -23,7 +23,8 @@ mail.init_app(app)
 CORS(app, supports_credentials=True, origins=[
     "http://localhost:5173",
     "https://drs-frontend-b2bt.onrender.com"
-], resources={r"/api/*": {"origins": "*"}})
+])
+
 
 # Konfiguracija baze (PostgreSQL sa SSL podrškom)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
