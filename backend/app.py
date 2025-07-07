@@ -8,12 +8,14 @@ from flask_socketio import SocketIO
 from routes.email_sender import mail
 import time
 from sqlalchemy import text
+import os
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 
-CORS(app, origins="http://localhost:5173")
+CORS(app, origins=["http://localhost:5173", "https://drs-frontend.onrender.com"])
+
 
 # Konfiguracija baze
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
@@ -72,4 +74,6 @@ if __name__ == '__main__':
     wait_for_db()  # čekaj da baza bude dostupna prije starta
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
+
