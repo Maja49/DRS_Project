@@ -11,12 +11,10 @@ from sqlalchemy import text
 import os
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
-CORS(app, resources={r"/api/*": {"origins": "*"}}) 
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 
-CORS(app, origins=["http://localhost:5173", "https://drs-frontend.onrender.com"])
-
+CORS(app, origins="http://localhost:5173")
 
 # Konfiguracija baze
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
