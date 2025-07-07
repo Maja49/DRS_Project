@@ -1,19 +1,22 @@
+# import eventlet
+# eventlet.monkey_patch()
+
 from flask import Flask
-from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp, user_bp
 from models import db
 import config
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from flask_socketio import SocketIO
+from extensions import socketio
 from routes.email_sender import mail
 import time
 from sqlalchemy import text
+from routes import auth_bp, admin_bp, theme_bp, discussion_bp, comment_bp, user_bp
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 
-CORS(app, origins="http://localhost:5173")
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 # Konfiguracija baze
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
@@ -23,16 +26,16 @@ app.secret_key = config.SECRET_KEY
 
 print(f"Connecting to DB as: {config.DB_USER}, pass: {config.DB_PASSWORD}, host: {config.DB_HOST}, db: {config.DB_NAME}")
 
-
-
 # inicijalizacija baze, povezuje SQLAlchemy sa flask aplikacijom, inicijalizuje se baza i omogucava aplikaciji da koristi SQLAlchemy za upravljanje podacima
 #db je instanca SQLAlchemy koja omogucava komunikaciu sa bazom
 db.init_app(app)
 
+socketio.init_app(app)
+# socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173", async_mode="threading")
+
 # registracija Blueprint-a
 #ovaj blueprint ce se koristiti za login i registraciju, prefiks ce im biti /api/auth
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
-
 
 # ruta za admina koji upravlja registracijama
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
@@ -66,10 +69,8 @@ def wait_for_db():
             time.sleep(1)
     raise Exception("Could not connect to the database after 30 attempts")
 
-
-
 if __name__ == '__main__':
     wait_for_db()  # čekaj da baza bude dostupna prije starta
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

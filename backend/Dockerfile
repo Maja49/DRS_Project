@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5000
 
 # Definiši komandu za pokretanje aplikacije
-CMD ["python", "app.py"]
+CMD ["python", "-u", "./app.py"]

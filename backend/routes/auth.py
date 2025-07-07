@@ -5,7 +5,7 @@ from models.user import User
 from flask_jwt_extended import create_access_token
 from utils.token_utils import generate_token, decode_token
 from utils.email_utils import trigger_email
-
+from extensions import socketio
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -48,6 +48,18 @@ def register():
     try:
         db.session.add(new_user)
         db.session.commit()
+        
+        # Emitovanje događaja za nove registracijske zahteve
+        socketio.emit('new_registration_request', {
+            'id': new_user.id,
+            'name': new_user.name,
+            'lastname': new_user.lastname,
+            'email': new_user.email,
+            'username': new_user.username,
+            'accept_url': f'/api/admin/registration-requests/accept/{new_user.id}',
+            'reject_url': f'/api/admin/registration-requests/reject/{new_user.id}'
+        }, namespace='/admin')
+        
         return jsonify({"message": "User registered successfully"}), 201
     except Exception as e:
         db.session.rollback()

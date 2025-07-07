@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import axios from "axios";
 import "./AdminPage.css";
 import "./Discussion";
@@ -50,6 +51,7 @@ const AdminPage: React.FC = () => {
   const [newPostTheme, setNewPostTheme] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const socket = io("http://localhost:5000/admin");
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -68,6 +70,38 @@ const AdminPage: React.FC = () => {
       window.onpopstate = null;
     };
   }, [navigate]);
+
+  useEffect(() => {
+    const handleRegistrationUpdated = (data: {
+      user_id: number;
+      status: string;
+    }) => {
+      console.log("Socket event received:", data);
+      fetchRegistrationRequests();
+      setSuccessMessage(
+        `Registration ${data.status} (user ID ${data.user_id})`
+      );
+    };
+
+    const handleNewRegistrationRequest = (data: RegistrationRequest) => {
+      console.log("New registration request received:", data);
+
+      // DIREKTNO dodajemo novi zahtev u stanje
+      setRequests((prevRequests) => [...prevRequests, data]);
+
+      setSuccessMessage(
+        `New registration request from ${data.name} ${data.lastname}`
+      );
+    };
+
+    socket.on("registration_updated", handleRegistrationUpdated);
+    socket.on("new_registration_request", handleNewRegistrationRequest);
+
+    return () => {
+      socket.off("registration_updated", handleRegistrationUpdated);
+      socket.off("new_registration_request", handleNewRegistrationRequest);
+    };
+  }, []);
 
   useEffect(() => {
     const { username, userId } = getUserInfoFromToken();
