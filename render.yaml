@@ -3,7 +3,7 @@ services:
     name: drs-backend
     env: docker
     plan: free
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: backend/Dockerfile.render   # Ovdje je promjena
     envVars:
       - key: DB_USER
         value: sql7787897
@@ -15,9 +15,12 @@ services:
         value: sql7787897
     autoDeploy: true
 
+
   - type: web
     name: drs-frontend
     env: docker
+    dockerfilePath: frontend/Dockerfile.render
+    buildCommand: ""
     plan: free
-    dockerfilePath: frontend/Dockerfile
-    autoDeploy: true
+    startCommand: "npm run preview -- --host"
+

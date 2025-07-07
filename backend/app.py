@@ -8,6 +8,7 @@ from flask_socketio import SocketIO
 from routes.email_sender import mail
 import time
 from sqlalchemy import text
+import os
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
@@ -72,4 +73,6 @@ if __name__ == '__main__':
     wait_for_db()  # čekaj da baza bude dostupna prije starta
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
+

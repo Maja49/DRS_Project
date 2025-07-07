@@ -1,0 +1,15 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Kopiraj fajl requirements_render.txt kao requirements.txt da bi pip mogao da ga koristi
+COPY backend/requirements_render.txt . 
+
+RUN pip install --no-cache-dir -r requirements_render.txt
+
+# Kopiraj sav kod u backend folderu u /app u kontejneru
+COPY backend/ .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]

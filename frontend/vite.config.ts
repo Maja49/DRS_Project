@@ -13,5 +13,12 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',  // ⚠️ OVO JE KLJUČNO da se vidi iz Dockera
     port: 5173
+  },
+    preview: {
+    host: true,
+    port: 4173,
+    allowedHosts: [
+      'drs-frontend-b2bt.onrender.com'
+    ],
   }
 })
