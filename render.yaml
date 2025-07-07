@@ -15,8 +15,6 @@ services:
         value: drs_postgres
       - key: DB_PORT
         value: '5432'
-      - key: DB_SSLMODE
-        value: require
       - key: SECRET_KEY
         value: a#4h!r3d89D09$2faHf!sd83F@#s
       - key: MAIL_SERVER
@@ -36,6 +34,5 @@ services:
   - type: web
     name: drs-frontend
     env: docker
-    plan: free
     dockerfilePath: frontend/Dockerfile.render
-    autoDeploy: true
+    plan: free
