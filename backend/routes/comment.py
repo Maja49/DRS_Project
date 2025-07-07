@@ -12,7 +12,7 @@ import re
 comment_bp = Blueprint('comment', __name__)
 
 # region creating new comment(enabled to mention user)
-@comment_bp.route('/comment/<int:discussion_id>', methods=['POST'])
+@comment_bp.route('/comment/<int:discussion_id>', methods=['POST', 'OPTIONS'])
 def comment_discussion(discussion_id):
     # Provera tokena iz Authorization zaglavlja
     token = request.headers.get('Authorization')
@@ -109,7 +109,7 @@ def comment_discussion(discussion_id):
 # endregion
 
 # region getting comments of one discussion(with discussion id)
-@comment_bp.route('/getcomments/<int:discussion_id>', methods=['GET'])
+@comment_bp.route('/getcomments/<int:discussion_id>', methods=['GET', 'OPTIONS'])
 def get_comments_by_discussion(discussion_id):
     try:
         # Proveravamo da li diskusija postoji
@@ -142,7 +142,7 @@ def get_comments_by_discussion(discussion_id):
 
 
 # region deleting comment
-@comment_bp.route('/deletecomment/<int:comment_id>', methods=['DELETE'])
+@comment_bp.route('/deletecomment/<int:comment_id>', methods=['DELETE', 'OPTIONS'])
 def delete_comment(comment_id):
     token = request.headers.get('Authorization')
     if not token:
@@ -175,7 +175,6 @@ def delete_comment(comment_id):
 
     if user.is_admin == 1 or user_id == comment.user_id or user_id == discussion.user_id:
         try:
-            # 🔥 Prvo obriši sve povezane veze iz tabele CommentDiscussion
             CommentDiscussion.query.filter_by(comment_id=comment_id).delete()
 
             # Zatim obriši sam komentar

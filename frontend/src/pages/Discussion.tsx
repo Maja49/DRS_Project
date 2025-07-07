@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns"; // instalirajte ovo
 import "./Discussion.css";
 
+const BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || "http://localhost:5000";
+
 interface User {
   username: string;
 }
@@ -70,7 +72,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
   comments.forEach((c: Comment) => console.log("Comment user_id:", c.user_id));
 
   const getUserById = (userId: number | string): Promise<string> => {
-    return fetch(`http://localhost:5000/api/user/get_user/${userId}`)
+    return fetch(`${BASE_URL}/api/user/get_user/${userId}`)
       .then((response) => response.json())
       .then((data: User) => data.username)
       .catch((error) => {
@@ -93,7 +95,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
     fetchUsers();
   }, [comments]); // Učitava kada se komentari promene
   useEffect(() => {
-    fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+    fetch(`${BASE_URL}/api/comment/getcomments/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -106,7 +108,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
   useEffect(() => {
     // Fetch user details based on user_id
-    fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
+    fetch(`${BASE_URL}/api/user/get_user/${user_id}`)
       .then((response) => response.json())
       .then((data) => setUser(data))
       .catch((error) => console.error("Error fetching user data:", error));
@@ -115,7 +117,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
   const handleDelete = () => {
     const token = localStorage.getItem("auth_token");
 
-    fetch(`http://localhost:5000/api/discussion/delete/${id}`, {
+    fetch(`${BASE_URL}/api/discussion/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +137,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
   const handleSaveEdit = () => {
     const token = localStorage.getItem("auth_token");
 
-    fetch(`http://localhost:5000/api/discussion/update/${id}`, {
+    fetch(`${BASE_URL}/api/discussion/update/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -163,7 +165,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/discussion/like_dislike/${id}`,
+        `${BASE_URL}/api/discussion/like_dislike/${id}`,
         {
           method: "POST",
           headers: {
@@ -211,7 +213,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
     if (newComment.text.trim() !== "") {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/comment/comment/${discussionId}`,
+          `${BASE_URL}/api/comment/comment/${discussionId}`,
           {
             method: "POST",
             headers: {
@@ -228,7 +230,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
         const data = await response.json();
 
         if (response.ok) {
-          fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+          fetch(`${BASE_URL}/api/comment/getcomments/${id}`)
             .then((res) => res.json())
             .then((data) => setComments(data));
           setNewComment({ ...newComment, text: "" });
@@ -261,7 +263,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/comment/deletecomment/${commentId}`,
+        `${BASE_URL}/api/comment/deletecomment/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -271,7 +273,7 @@ export const Discussion: React.FC<DiscussionProps> = ({
       );
 
       if (response.ok) {
-        fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+        fetch(`${BASE_URL}/api/comment/getcomments/${id}`)
           .then((res) => res.json())
           .then((data) => setComments(data));
         console.log("Comment deleted successfully");
