@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 from models import db  # Baza
 from models.theme import Theme
+from models.discussion import Discussion
+from models.comment import Comment
+from models.likeDislike import LikeDislike
 from utils.token_utils import decode_token
 
 theme_bp = Blueprint('theme', __name__)
@@ -85,36 +88,38 @@ def delete_theme(theme_id):
     if not decoded.get('is_admin'):
         return jsonify({"message": "Unauthorized. Only admins can delete themes."}), 403
 
-    theme = Theme.query.get(theme_id)
-    if not theme:
-        return jsonify({"message": "Theme not found"}), 404
-
     try:
-        from models.discussion import Discussion
-        from models.comment import Comment
-        from models.likeDislike import LikeDislike
+        # 1. Prvo dohvati sve diskusije koje pripadaju toj temi
+        discussion_ids = [d.id for d in Discussion.query.filter_by(theme_id=theme_id).all()]
 
-        # Sve diskusije koje pripadaju ovoj temi
-        discussions = Discussion.query.filter_by(theme_id=theme_id).all()
+        if discussion_ids:
+            # 2. Obriši komentare za sve diskusije te teme
+            db.session.execute(
+                Comment.__table__.delete().where(Comment.discussion_id.in_(discussion_ids))
+            )
 
-        for discussion in discussions:
-            # Prvo brišemo komentare vezane za ovu diskusiju
-            db.session.query(Comment).filter_by(discussion_id=discussion.id).delete()
+            # 3. Obriši lajkove/dislajkove za sve diskusije te teme
+            db.session.execute(
+                LikeDislike.__table__.delete().where(LikeDislike.discussion_id.in_(discussion_ids))
+            )
 
-            # Zatim brišemo lajkove/dislajkove
-            db.session.query(LikeDislike).filter_by(discussion_id=discussion.id).delete()
+            # 4. Obriši diskusije
+            db.session.execute(
+                Discussion.__table__.delete().where(Discussion.id.in_(discussion_ids))
+            )
 
-            # Na kraju brišemo diskusiju
-            db.session.delete(discussion)
+        # 5. Obriši temu
+        db.session.execute(
+            Theme.__table__.delete().where(Theme.id == theme_id)
+        )
 
-        # Brišemo samu temu
-        db.session.delete(theme)
         db.session.commit()
-        return jsonify({"message": "Theme deleted successfully."}), 200
+        return jsonify({"message": "Theme and related data deleted successfully"}), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
+
 
 
 # Lista svih tema

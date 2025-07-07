@@ -354,36 +354,25 @@ def comment_discussion(discussion_id):
 # region search discussions
 @discussion_bp.route('/search', methods=['GET'])
 def search_discussions():
-    # Uzimamo parametre pretrage iz query string-a
-    theme_name = request.args.get('theme_name')
-    user_name = request.args.get('name')
-    user_lastname = request.args.get('lastname')
-    user_address = request.args.get('address')
-    user_email = request.args.get('email')
+    query_param = request.args.get('q', '').strip()
     
     # Kreiranje osnovnog upita
     query = db.session.query(Discussion).join(User, Discussion.user_id == User.id).join(Theme, Discussion.theme_id == Theme.id)
 
     # Dodavanje filtera za pretragu na osnovu prosleđenih parametara
-    filters = []
-    if theme_name:
-        filters.append(Theme.name.ilike(f"%{theme_name}%"))
-    if user_name:
-        filters.append(User.name.ilike(f"%{user_name}%"))
-    if user_lastname:
-        filters.append(User.lastname.ilike(f"%{user_lastname}%"))
-    if user_address:
-        filters.append(User.adress.ilike(f"%{user_address}%"))
-    if user_email:
-        filters.append(User.email.ilike(f"%{user_email}%"))
-
-    # Primena filtera ako postoje
-    if filters:
-        query = query.filter(or_(*filters))
-
-    # Izvršavanje upita
-    discussions = query.all()
-    # Sortiranje
+    if query_param:
+        ilike_query = f"%{query_param}%"
+        query = query.filter(
+            or_(
+                Theme.name.ilike(ilike_query),
+                User.name.ilike(ilike_query),
+                User.lastname.ilike(ilike_query),
+                User.adress.ilike(ilike_query),
+                User.email.ilike(ilike_query),
+                User.username.ilike(ilike_query),
+            )
+        )
+        
     discussions = query.order_by(Discussion.created_at.desc()).all()
 
     # Formatiranje rezultata u JSON odgovor
@@ -393,18 +382,12 @@ def search_discussions():
             "id": discussion.id,
             "text": discussion.text,
             "title": discussion.title,
-            "theme": discussion.theme.name,
-            "user": {
-                "id": discussion.user_id,
-                "name": User.query.get(discussion.user_id).name,
-                "lastname": User.query.get(discussion.user_id).lastname,
-                "email": User.query.get(discussion.user_id).email
-            },
+            "theme_name": discussion.theme.name,
+            "user_id": discussion.user_id,        
             "likes": discussion.likes,
             "dislikes": discussion.dislikes,
-            "created_at": discussion.created_at  #Da bi upisalo vreme kako treba 
-
-        })
+            "created_at": discussion.created_at.isoformat() 
+    })
 
     return jsonify(results), 200
 # endregion

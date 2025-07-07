@@ -94,6 +94,7 @@ const User: React.FC = () => {
             country: userData.country,
             phone_number: userData.phone,
             username: userData.username,
+            password: userData.password
           }),
         }
       );
@@ -118,7 +119,7 @@ const User: React.FC = () => {
   return (
     <div className="user-container">
       <div className="user-header">
-        <h1>Izmena korisničkih podataka</h1>
+        <h1>Edit Profile</h1>
       </div>
 
       <Form className="user-form">
@@ -126,19 +127,19 @@ const User: React.FC = () => {
           <Form.Group className="mb-3" key={key}>
             <Form.Label>
               {key === "firstName"
-                ? "Ime"
+                ? "First Name"
                 : key === "lastName"
-                ? "Prezime"
+                ? "Last Name"
                 : key === "address"
-                ? "Adresa"
+                ? "Address"
                 : key === "city"
-                ? "Grad"
+                ? "City"
                 : key === "country"
-                ? "Država"
+                ? "Country"
                 : key === "phone"
-                ? "Broj telefona"
+                ? "Phone number"
                 : key === "username"
-                ? "Korisničko ime"
+                ? "Username"
                 : key}
             </Form.Label>
             <Form.Control
@@ -152,14 +153,14 @@ const User: React.FC = () => {
         ))}
 
         <Button variant="primary" onClick={handleSave} className="save-button">
-          Sačuvaj izmene
+          Save changes
         </Button>
         <Button
           variant="outline-primary"
           onClick={handleBack}
           className="back-button"
         >
-          Nazad
+          Back
         </Button>
       </Form>
     </div>

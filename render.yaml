@@ -4,38 +4,15 @@ services:
     env: docker
     plan: free
     dockerfilePath: backend/Dockerfile
-    buildCommand: ""
-    startCommand: "python app.py"
     envVars:
       - key: DB_USER
-        value: drs_user
+        value: sql7787897
       - key: DB_PASSWORD
-        value: drs_pass
+        value: SbjFwu2Fa3
       - key: DB_HOST
-        value: drs-db
+        value: sql7.freesqldatabase.com
       - key: DB_NAME
-        value: drs_clean
-    autoDeploy: true
-    dependsOn:
-      - drs-db
-
-  - type: private_service
-    name: drs-db
-    env: docker
-    plan: free
-    dockerImage: mysql:8.0
-    envVars:
-      - key: MYSQL_ROOT_PASSWORD
-        value: 2310
-      - key: MYSQL_DATABASE
-        value: drs_clean
-      - key: MYSQL_USER
-        value: drs_user
-      - key: MYSQL_PASSWORD
-        value: drs_pass
-    ports:
-      - port: 3306
-    persistentDisk: true
+        value: sql7787897
     autoDeploy: true
 
   - type: web
@@ -43,8 +20,4 @@ services:
     env: docker
     plan: free
     dockerfilePath: frontend/Dockerfile
-    buildCommand: ""
-    startCommand: "npm run dev -- --host"
     autoDeploy: true
-    dependsOn:
-      - drs-backend

@@ -8,7 +8,10 @@ class Comment(db.Model):
     
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('User.id'), nullable=False)  # Obavezno
-    discussion_id = Column(Integer, ForeignKey('discussion.id'), nullable=False)  # Povezivanje sa diskusijama
+    discussion_id = Column(Integer, ForeignKey('discussion.id', ondelete='CASCADE'), nullable=False)
+
+    discussion = relationship('Discussion', backref='comment', passive_deletes=True)
+
     text = Column(String(255), nullable=False)
     mentioned_user_id = Column(Integer, ForeignKey('User.id'), nullable=True)  # Opcionalno
 
@@ -24,4 +27,3 @@ class Comment(db.Model):
         self.mentioned_user_id = mentioned_user_id
 
     def __repr__(self):        return f'<Comment {self.id}, User {self.user_id}, Mentioned User {self.mentioned_user_id}>'
-

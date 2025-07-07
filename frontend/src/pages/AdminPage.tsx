@@ -32,7 +32,7 @@ interface Theme {
 }
 
 const AdminPage: React.FC = () => {
-  const username = getUsernameFromToken();
+  const [username, setUsername] = useState<string>("Guest");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -48,21 +48,53 @@ const AdminPage: React.FC = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostText, setNewPostText] = useState("");
   const [newPostTheme, setNewPostTheme] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  function getUsernameFromToken(): string {
-    const token = localStorage.getItem("auth_token"); // JWT token iz localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      navigate("/Login", { replace: true }); // Ako nema tokena, idi na login i zameni istoriju
+      return;
+    }
+
+    // Blokiraj back dugme (da ne moze nazad na login)
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.go(1);
+    };
+
+    return () => {
+      window.onpopstate = null;
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    const { username, userId } = getUserInfoFromToken();
+    setUserId(userId);
+    setUsername(username);
+  }, []);
+
+  const myDiscussions = discussions.filter(
+    (discussion) => discussion.user_id === userId
+  );
+
+  function getUserInfoFromToken(): { username: string; userId: number | null } {
+    const token = localStorage.getItem("auth_token");
     if (token) {
       try {
         const payloadBase64 = token.split(".")[1];
-        const decodedPayload = JSON.parse(atob(payloadBase64)); // Dekodiramo payload
-        return decodedPayload.username || "Guest"; // Vraćamo korisničko ime ili "Guest" ako nije dostupno
+        const decodedPayload = JSON.parse(atob(payloadBase64));
+        return {
+          username: decodedPayload.username || "Guest",
+          userId: decodedPayload.user_id || null,
+        };
       } catch (error) {
         console.error("Error decoding token:", error);
-        return "Guest"; // Ako nešto pođe po zlu, vraćamo "Guest"
+        return { username: "Guest", userId: null };
       }
     }
-    return "Guest"; // Ako token ne postoji
+    return { username: "Guest", userId: null };
   }
 
   // Dohvatanje zahtjeva za registraciju
@@ -175,20 +207,23 @@ const AdminPage: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault(); // Sprečava osvežavanje stranice
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim() === "") {
+        fetchDiscussions();
+      } else {
+        handleSearch(searchQuery);
+      }
+    }, 400);
 
-    const queryParams: { [key: string]: string } = {};
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
 
-    // Dodaj parametar u queryParams objekat
-    if (searchQuery.trim()) {
-      queryParams.theme_name = searchQuery.trim(); // Ovdje se može menjati parametar u zavisnosti od unosa
-    }
-
-    // Kreiraj URL sa parametrima
-    const queryString = new URLSearchParams(queryParams).toString();
-    const url = queryString
-      ? `http://localhost:5000/api/discussion/search?${queryString}`
+  const handleSearch = (query: string) => {
+    const url = query.trim()
+      ? `http://localhost:5000/api/discussion/search?q=${encodeURIComponent(
+          query
+        )}`
       : `http://localhost:5000/api/discussion/get_all`;
 
     // Fetch zahteva za pretragu
@@ -200,19 +235,12 @@ const AdminPage: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("Search Results:", data);
         setDiscussions(data); // Postavi rezultate pretrage
       })
       .catch((error) => {
         console.error("Error fetching search results:", error);
       });
   };
-
-  // const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-  //   if (e.key === "Enter") {
-  //     handleSearch(e);
-  //   }
-  // };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -224,6 +252,13 @@ const AdminPage: React.FC = () => {
   };
 
   ////////teme i duskusije///////////
+  const fetchDiscussions = () => {
+    fetch("http://localhost:5000/api/discussion/get_all")
+      .then((response) => response.json())
+      .then((data) => setDiscussions(data.discussions))
+      .catch((error) => console.error("Error fetching discussions:", error));
+  };
+
   useEffect(() => {
     // Učitavamo sve teme sa servera
     fetch("http://localhost:5000/api/discussion/themes")
@@ -231,14 +266,18 @@ const AdminPage: React.FC = () => {
       .then((data) => setThemes(data)) // Postavljamo teme u state
       .catch((error) => console.error("Error fetching themes:", error));
 
-    fetch("http://localhost:5000/api/discussion/get_all")
-      .then((response) => response.json())
-      .then((data) => setDiscussions(data.discussions))
-      .catch((error) => console.error("Error fetching discussions:", error));
+    fetchDiscussions();
   }, []);
 
   const handleDiscussions = () => {
-    navigate("/Discussions"); // Redirect to discussions page
+    setActiveTab("my-discussions");
+
+    setTimeout(() => {
+      const adminPageDiv = document.querySelector(".admin-page");
+      if (adminPageDiv) {
+        adminPageDiv.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }, 0);
   };
 
   const handleAddPost = () => {
@@ -388,11 +427,6 @@ const AdminPage: React.FC = () => {
               placeholder="Search... by Theme Name, Email, etc."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch(e);
-                }
-              }}
               className="search-input"
             />
             <img src="/search.png" alt="Search Icon" className="search-icon" />
@@ -485,13 +519,33 @@ const AdminPage: React.FC = () => {
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
+        {activeTab === "my-discussions" && (
+          <div className="discussion-space">
+            {myDiscussions.length > 0 ? (
+              myDiscussions.map((discussion) => (
+                <Discussion
+                  key={discussion.id}
+                  {...discussion}
+                  onUpdate={() => fetchDiscussions()}
+                />
+              ))
+            ) : (
+              <p>You haven't created any discussions yet.</p>
+            )}
+          </div>
+        )}
+
         {activeTab === "discussion" && (
           <div className="discussion-space">
             {/* Discussions Section */}
             <div className="discussions-section">
               {discussions.length > 0 ? (
                 discussions.map((discussion) => (
-                  <Discussion key={discussion.id} {...discussion} />
+                  <Discussion
+                    key={discussion.id}
+                    {...discussion}
+                    onUpdate={() => fetchDiscussions()}
+                  />
                 ))
               ) : (
                 <p>No discussions available</p>

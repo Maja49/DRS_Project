@@ -28,7 +28,7 @@ const SignUp: React.FC = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Lozinke se ne poklapaju");
+      setErrorMessage("Passwords do not match");
       return;
     }
 
@@ -46,18 +46,18 @@ const SignUp: React.FC = () => {
       if (data.message === "User registered successfully") {
         window.location.href = "/login";
       } else {
-        setErrorMessage(data.message || "Registracija nije uspela");
+        setErrorMessage(data.message || "Registration failed");
       }
     } catch (error) {
-      console.error("Greška prilikom registracije:", error);
-      setErrorMessage("Došlo je do greške!");
+      console.error("Error while registrating:", error);
+      setErrorMessage("There has been an error!");
     }
   };
 
   return (
     <MDBContainer className="signup-container">
-      <h2>Registracija</h2>
-      <p>Napravite nalog</p>
+      <h2>Sign Up</h2>
+      <p>Register your account</p>
 
       <form onSubmit={handleSubmit}>
         {Object.keys(formData).map((key) => (
@@ -80,11 +80,11 @@ const SignUp: React.FC = () => {
         {errorMessage && <p className="error-message">{errorMessage}</p>}
 
         <button type="submit" className="btn">
-          Registruj se
+          Sign Up
         </button>
 
         <a href="/login" className="login-link">
-          Već imate nalog? Prijavite se
+          Already have an account? Log In
         </a>
       </form>
     </MDBContainer>

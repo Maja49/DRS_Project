@@ -25,6 +25,7 @@ export interface DiscussionProps {
   dislikes: number;
   user_id: number;
   onDelete?: (id: number) => void;
+  onUpdate?: (id: number) => void;
 }
 
 export const Discussion: React.FC<DiscussionProps> = ({
@@ -34,13 +35,14 @@ export const Discussion: React.FC<DiscussionProps> = ({
   theme_name,
   created_at,
   // updated_at,
-  likes: initialLikes,
-  dislikes: initialDislikes,
+  likes: initialLikes = 0,
+  dislikes: initialDislikes = 0,
   user_id,
   onDelete,
+  onUpdate,
 }) => {
   const currentUserId = Number(localStorage.getItem("user_id"));
- 
+
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
@@ -63,10 +65,9 @@ export const Discussion: React.FC<DiscussionProps> = ({
   const [isCommentSectionVisible, setIsCommentSectionVisible] =
     useState<boolean>(false);
 
-     console.log("currentUserId:", currentUserId);
+  console.log("currentUserId:", currentUserId);
   console.log("Discussion author user_id:", user_id);
   comments.forEach((c: Comment) => console.log("Comment user_id:", c.user_id));
-
 
   const getUserById = (userId: number | string): Promise<string> => {
     return fetch(`http://localhost:5000/api/user/get_user/${userId}`)
@@ -186,8 +187,8 @@ export const Discussion: React.FC<DiscussionProps> = ({
         setDislikes(data.dislikes);
         setHasLiked(action === "like");
         setHasDisliked(action === "dislike");
-    }
-     else {
+        onUpdate?.(id);
+      } else {
         console.error(data.message || "An error occurred.");
       }
     } catch (error) {
@@ -234,8 +235,8 @@ export const Discussion: React.FC<DiscussionProps> = ({
 
         if (response.ok) {
           fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
-          .then(res => res.json())
-          .then(data => setComments(data));
+            .then((res) => res.json())
+            .then((data) => setComments(data));
           setNewComment({ ...newComment, text: "" });
         } else {
           console.error("Error adding comment:", data.message);
@@ -276,9 +277,9 @@ export const Discussion: React.FC<DiscussionProps> = ({
       );
 
       if (response.ok) {
-          fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
-            .then(res => res.json())
-            .then(data => setComments(data));
+        fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+          .then((res) => res.json())
+          .then((data) => setComments(data));
         console.log("Comment deleted successfully");
       } else {
         const data = await response.json();
@@ -386,12 +387,14 @@ export const Discussion: React.FC<DiscussionProps> = ({
             <div className="comments-list">
               {comments.length > 0 ? (
                 comments.map((comment, index) => (
-                    <div key={comment.comment_id || index} className="comment">
+                  <div key={comment.comment_id || index} className="comment">
                     <p>
-                      <strong>{users[index] || 'loading..'}</strong>: {comment.text}
+                      <strong>{users[index] || "loading.."}</strong>:{" "}
+                      {comment.text}
                     </p>
 
-                    {(comment.user_id === currentUserId || user_id === currentUserId) && (
+                    {(comment.user_id === currentUserId ||
+                      user_id === currentUserId) && (
                       <button
                         className="delete-comment-button"
                         onClick={() => handleDeleteComment(comment.comment_id)}

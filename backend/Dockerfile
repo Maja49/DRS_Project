@@ -9,11 +9,12 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Kopiraj ostatak koda
+# Kopiraj samo backend kod
 COPY . .
 
 # Izloži port na kojem aplikacija radi
 EXPOSE 5000
 
 # Definiši komandu za pokretanje aplikacije
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:${PORT}", "wsgi:app"]
+
