@@ -22,6 +22,10 @@ mail.init_app(app)
 
 CORS(app, origins="http://localhost:5173")
 
+@app.route('/')
+def index():
+    return "Backend radi, dobrodošli!"
+
 # Konfiguracija baze
 #app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
 app.config['SQLALCHEMY_DATABASE_URI'] = (
