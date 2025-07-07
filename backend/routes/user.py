@@ -6,15 +6,16 @@ from utils.email_utils import trigger_email
 
 user_bp = Blueprint('user', __name__)
 
-# Funkcija za dobavljanje podataka korisnika prema user_id
+# Dobavljanje podataka korisnika prema user_id
 @user_bp.route('/get_user/<int:user_id>', methods=['GET', 'OPTIONS'])
 def get_user(user_id):
-    # Pronalaženje korisnika u bazi prema ID-u
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    # Prikupljanje podataka o korisniku
     user_data = {
         "id": user.id,
         "name": user.name,
@@ -31,27 +32,26 @@ def get_user(user_id):
 
     return jsonify(user_data), 200
 
-# region azuriranje naloga
-# Ažuriranje korisničkog profila
+
+# Ažuriranje korisničkog naloga
 @user_bp.route('/update_account', methods=['PUT', 'OPTIONS'])
 def update_account():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
 
-    # Validacija tokena
     decoded = decode_token(token.split()[1])
     if "error" in decoded:
         return jsonify({"message": decoded["error"]}), 403
 
     user_id = decoded["user_id"]
-
-    # Pronalaženje korisnika prema ID-ju iz tokena
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
-    # Ažuriranje podataka
     data = request.json
     if data.get('name'):
         user.name = data['name']
@@ -70,23 +70,23 @@ def update_account():
         if existing_user and existing_user.id != user.id:
             return jsonify({"message": "Username already taken"}), 400
         user.username = data['username']
-
     if data.get('password'):
         user.password = data['password']
 
-
-    # Čuvanje promena
     try:
         db.session.commit()
         return jsonify({"message": "Account updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Error updating account", "error": str(e)}), 500
-# endregion
 
 
+# Odobravanje registracije korisnika od strane admina
 @user_bp.route('/approve_registration', methods=['POST', 'OPTIONS'])
 def approve_registration():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     data = request.json
     user_id = data.get("user_id")
     user = User.query.get(user_id)
@@ -97,14 +97,12 @@ def approve_registration():
     user.is_approved = True
     db.session.commit()
 
-    # Pošaljite email korisniku
     trigger_email(
         user.email,
         "Registracija odobrena",
         f"Poštovani {user.name}, vaša registracija je odobrena. Dobrodošli!"
     )
 
-    # Pošaljite email administratoru
     trigger_email(
         "celicdorde@gmail.com",
         "Korisnik odobren",

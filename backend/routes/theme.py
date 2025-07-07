@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db  # Baza
+from models import db
 from models.theme import Theme
 from models.discussion import Discussion
 from models.comment import Comment
@@ -11,6 +11,9 @@ theme_bp = Blueprint('theme', __name__)
 # Dodavanje nove teme
 @theme_bp.route('/create', methods=['POST', 'OPTIONS'])
 def create_theme():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
@@ -48,6 +51,9 @@ def create_theme():
 # Ažuriranje teme
 @theme_bp.route('/update/<int:theme_id>', methods=['PUT', 'OPTIONS'])
 def update_theme(theme_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
@@ -77,6 +83,9 @@ def update_theme(theme_id):
 # Brisanje teme
 @theme_bp.route('/delete/<int:theme_id>', methods=['DELETE', 'OPTIONS'])
 def delete_theme(theme_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
@@ -120,11 +129,12 @@ def delete_theme(theme_id):
         db.session.rollback()
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
 
-
-
 # Lista svih tema
 @theme_bp.route('/list', methods=['GET', 'OPTIONS'])
 def list_themes():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     themes = Theme.query.all()
     return jsonify([
         {
