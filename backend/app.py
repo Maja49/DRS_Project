@@ -20,7 +20,8 @@ app = Flask(__name__)  # Inicijalizacija Flask aplikacije
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 
-CORS(app, origins="http://localhost:5173")
+CORS(app, origins=["http://localhost:5173", "https://drs-frontend-b2bt.onrender.com"])
+
 
 @app.route('/')
 def index():
