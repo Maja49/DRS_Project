@@ -15,9 +15,12 @@ services:
         value: sql7787897
     autoDeploy: true
 
+services:
   - type: web
     name: drs-frontend
     env: docker
-    plan: free
     dockerfilePath: frontend/Dockerfile
-    autoDeploy: true
+    buildCommand: ""
+    startCommand: ""
+    plan: free
+
