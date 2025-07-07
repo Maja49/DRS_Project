@@ -17,7 +17,6 @@ class Comment(db.Model):
 
     # Relationships
     user = relationship('User', backref='comment', foreign_keys=[user_id])
-    discussion = relationship('Discussion', backref='comment')  # Veza sa Discussion modelom
     mentioned_user = relationship('User', foreign_keys=[mentioned_user_id], backref='mentioned_comments')
     
     def __init__(self, user_id, discussion_id, text, mentioned_user_id=None):

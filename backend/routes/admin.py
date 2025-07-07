@@ -3,9 +3,12 @@ from models import db
 from models.theme import Theme
 from models.user import User
 from models.discussion import Discussion
+from models.comment import Comment
+from models.likeDislike import LikeDislike
 from utils.token_utils import decode_token
 import traceback
 from .email_sender import send_email
+import logging
 
 
 admin_bp = Blueprint('admin', __name__)
@@ -193,33 +196,55 @@ def create_theme():
 
 @admin_bp.route('/theme-delete/<int:theme_id>', methods=['DELETE'])
 def delete_theme(theme_id):
+    print("[DEBUG] >>> Funkcija delete_theme je pozvana <<<", flush=True)
+    print(f"[DEBUG] DELETE tema pozvana, id = {theme_id}", flush=True)
+
     token = request.headers.get('Authorization')
     if not token:
+        print("[DEBUG] Token ne postoji!", flush=True)
         return jsonify({"message": "Token is missing"}), 403
 
     decoded = decode_token(token.split()[1])
+    print(f"[DEBUG] Token dekodiran: {decoded}", flush=True)
     if "error" in decoded:
+        print(f"[DEBUG] Token error: {decoded['error']}", flush=True)
         return jsonify({"message": decoded["error"]}), 403
 
     if not decoded.get('is_admin'):
+        print("[DEBUG] Korisnik nije admin!", flush=True)
         return jsonify({"message": "Unauthorized. Only admins can delete themes."}), 403
 
-    theme = Theme.query.get(theme_id)
-    if not theme:
-        return jsonify({"message": "Theme not found"}), 404
-
-    # Delete discussions related to the theme
     try:
+        theme = Theme.query.get(theme_id)
+        if not theme:
+            return jsonify({"message": "Theme not found"}), 404
+
         discussions = Discussion.query.filter_by(theme_id=theme_id).all()
+        print(f"[DEBUG] Pronađeno diskusija: {len(discussions)}", flush=True)
+
         for discussion in discussions:
+            print(f"[DEBUG] Brišem komentare diskusije ID {discussion.id}...", flush=True)
+            deleted_comments = Comment.query.filter_by(discussion_id=discussion.id).delete(synchronize_session=False)
+            print(f"[DEBUG] Obrisano komentara: {deleted_comments}", flush=True)
+
+            print(f"[DEBUG] Brišem lajkove/dislajkove diskusije ID {discussion.id}...", flush=True)
+            deleted_likes = LikeDislike.query.filter_by(discussion_id=discussion.id).delete(synchronize_session=False)
+            print(f"[DEBUG] Obrisano lajkova/dislajkova: {deleted_likes}", flush=True)
+
+            print(f"[DEBUG] Brišem diskusiju ID {discussion.id}...", flush=True)
             db.session.delete(discussion)
 
-        # Now delete the theme itself
+
+        print(f"[DEBUG] Brišem temu ID {theme_id}...", flush=True)
         db.session.delete(theme)
+
+        print(f"[DEBUG] Commit baze...", flush=True)
         db.session.commit()
-        return jsonify({"message": "Theme and associated discussions deleted successfully."}), 200
+        print("[DEBUG] Commit uspešan", flush=True)
+        return jsonify({"message": "Theme and all related discussions, comments, and likes deleted successfully"}), 200
+
     except Exception as e:
         db.session.rollback()
-        print(f"Error deleting theme ID {theme_id}: {traceback.format_exc()}")
+        print(f"[ERROR] Greška prilikom brisanja teme ID {theme_id}: {e}", flush=True)
         return jsonify({"message": "Error deleting theme", "error": str(e)}), 500
 

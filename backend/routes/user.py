@@ -66,9 +66,13 @@ def update_account():
     if data.get('phone_number'):
         user.phone_number = data['phone_number']
     if data.get('username'):
+        existing_user = User.query.filter_by(username=data['username']).first()
+        if existing_user and existing_user.id != user.id:
+            return jsonify({"message": "Username already taken"}), 400
         user.username = data['username']
+
     if data.get('password'):
-        user.username = data['password']
+        user.password = data['password']
 
 
     # Čuvanje promena
