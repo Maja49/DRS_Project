@@ -23,7 +23,10 @@ CORS(app, origins="http://localhost:5173")
 
 # Konfiguracija baze
 #app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+    "?sslmode=require"
+)
 
 
 
