@@ -61,7 +61,7 @@ def register():
 
 # region prijava korisnika
 # Ruta za prijavu
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route("/login", methods=["POST", "OPTIONS"])
 def login():
     data = request.json
     email = request.json.get('email')
@@ -90,35 +90,26 @@ def login():
 
 # region azuriranje naloga
 # Ažuriranje korisničkog profila
-@auth_bp.route('/update_account', methods=['PUT'])
+@auth_bp.route('/update_account', methods=['PUT', 'OPTIONS'])
 def update_account():
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
 
+    # Validacija tokena
     decoded = decode_token(token.split()[1])
     if "error" in decoded:
         return jsonify({"message": decoded["error"]}), 403
 
-    current_user_id = decoded["user_id"]
-    user = User.query.get(current_user_id)
+    user_id = decoded["user_id"]
+
+    # Pronalaženje korisnika prema ID-ju iz tokena
+    user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "User not found"}), 404
 
+    # Ažuriranje podataka
     data = request.json
-    print("Primljeni podaci za update:", data)  # DEBUG
-
-    new_username = data.get('username')
-    if new_username and new_username != user.username:
-        if User.query.filter_by(username=new_username).first():
-            return jsonify({"message": "Username already taken"}), 409
-        user.username = new_username
-
-    new_password = data.get('password')
-    if new_password:
-        user.password = new_password
-
-    # Ostali podaci
     if data.get('name'):
         user.name = data['name']
     if data.get('lastname'):
@@ -131,18 +122,19 @@ def update_account():
         user.country = data['country']
     if data.get('phone_number'):
         user.phone_number = data['phone_number']
+    if data.get('username'):
+        user.username = data['username']
 
+    # Čuvanje promena
     try:
-        db.session.flush()  # forsira update odmah
         db.session.commit()
         return jsonify({"message": "Account updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Error updating account", "error": str(e)}), 500
-
 # endregion
 
-@auth_bp.route('/approve_user/<int:user_id>', methods=['PATCH'])
+@auth_bp.route('/approve_user/<int:user_id>', methods=['PATCH', 'OPTIONS'])
 def approve_user(user_id):
     token = request.headers.get('Authorization')
     if not token:
@@ -182,7 +174,7 @@ def approve_user(user_id):
     return jsonify({"message": f"User {user.name} has been approved."}), 200
 
 # Ruta za odbijanje korisnika (admin)
-@auth_bp.route('/reject_user/<int:user_id>', methods=['PATCH'])
+@auth_bp.route('/reject_user/<int:user_id>', methods=['PATCH', 'OPTIONS'])
 def reject_user(user_id):
     token = request.headers.get('Authorization')
     if not token:

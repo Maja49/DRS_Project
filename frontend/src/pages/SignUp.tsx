@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MDBContainer } from "mdb-react-ui-kit";
 import "./SignUp.css";
 
+
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -16,6 +17,8 @@ const SignUp: React.FC = () => {
     username: "",
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -33,7 +36,7 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
