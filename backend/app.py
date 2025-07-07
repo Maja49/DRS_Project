@@ -11,6 +11,7 @@ from sqlalchemy import text
 import os
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
+CORS(app, resources={r"/api/*": {"origins": "*"}}) 
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 

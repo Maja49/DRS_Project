@@ -22,5 +22,5 @@ services:
     dockerfilePath: frontend/Dockerfile.render
     buildCommand: ""
     plan: free
-    #startCommand: "npm run preview -- --host"
+    startCommand: "npm run preview -- --host"
 
