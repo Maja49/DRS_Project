@@ -13,3 +13,6 @@ MAIL_PORT = os.getenv('MAIL_PORT', '')
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', '')
+
+
+DB_SSLMODE = os.getenv('DB_SSLMODE', 'disable')

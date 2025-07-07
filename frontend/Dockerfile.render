@@ -1,18 +1,21 @@
-# frontend/Dockerfile.render
-
-FROM node:20-alpine
+# 1. Faza: Build React aplikacije
+FROM node:20-alpine as builder
 
 WORKDIR /app
-
-# Bitno: promenjena putanja jer je kontekst sad root projekta
 COPY frontend/package*.json ./
 RUN npm install
 
-# Kopiraj ceo frontend folder
-COPY frontend/ .
-
+COPY frontend/ ./
 RUN npm run build
 
-EXPOSE 5173
+# 2. Faza: Serve buildovanih fajlova
+FROM node:20-alpine
 
-CMD ["npm", "run", "preview", "--", "--host"]
+WORKDIR /app
+RUN npm install -g serve
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4173
+
+CMD ["serve", "-s", "dist", "-l", "4173"]
