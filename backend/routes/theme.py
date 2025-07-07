@@ -9,7 +9,7 @@ from utils.token_utils import decode_token
 theme_bp = Blueprint('theme', __name__)
 
 # Dodavanje nove teme
-@theme_bp.route('/create', methods=['POST'])
+@theme_bp.route('/create', methods=['POST', 'OPTIONS'])
 def create_theme():
     token = request.headers.get('Authorization')
     if not token:
@@ -46,7 +46,7 @@ def create_theme():
     }), 201
 
 # Ažuriranje teme
-@theme_bp.route('/update/<int:theme_id>', methods=['PUT'])
+@theme_bp.route('/update/<int:theme_id>', methods=['PUT', 'OPTIONS'])
 def update_theme(theme_id):
     token = request.headers.get('Authorization')
     if not token:
@@ -75,7 +75,7 @@ def update_theme(theme_id):
         return jsonify({"message": "Error updating theme", "error": str(e)}), 500
 
 # Brisanje teme
-@theme_bp.route('/delete/<int:theme_id>', methods=['DELETE'])
+@theme_bp.route('/delete/<int:theme_id>', methods=['DELETE', 'OPTIONS'])
 def delete_theme(theme_id):
     token = request.headers.get('Authorization')
     if not token:
@@ -123,7 +123,7 @@ def delete_theme(theme_id):
 
 
 # Lista svih tema
-@theme_bp.route('/list', methods=['GET'])
+@theme_bp.route('/list', methods=['GET', 'OPTIONS'])
 def list_themes():
     themes = Theme.query.all()
     return jsonify([

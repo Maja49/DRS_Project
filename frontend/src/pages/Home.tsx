@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns"; // instalirajte ovo
 import "./Home.css";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+
 interface User {
   username: string;
 }
@@ -67,7 +70,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   function fetchDiscussions() {
     console.log("Fetching discussions...");
     
-    fetch("http://localhost:5000/api/discussion/get_all")
+    fetch(`${BASE_URL}/discussion/get_all`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -84,7 +87,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   }
 
  const handleAction = (action: "like" | "dislike") => {
-  fetch(`http://localhost:5000/api/discussion/like_dislike/${id}`, {
+  fetch(`${BASE_URL}/discussion/like_dislike/${id}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -121,7 +124,7 @@ const Discussion: React.FC<DiscussionProps> = ({
     useState<boolean>(false);
 
   const getUserById = (userId: number | string): Promise<string> => {
-    return fetch(`http://localhost:5000/api/user/get_user/${userId}`)
+    return fetch(`${BASE_URL}/user/get_user/${userId}`)
       .then((response) => response.json())
       .then((data: User) => data.username)
       .catch((error) => {
@@ -145,7 +148,7 @@ const Discussion: React.FC<DiscussionProps> = ({
   }, [comments]); // Učitava kada se komentari promene
   useEffect(() => {
     // Fetch user details based on user_id
-    fetch(`http://localhost:5000/api/user/get_user/${user_id}`)
+    fetch(`${BASE_URL}/user/get_user/${user_id}`)
       .then((response) => response.json())
       .then((data) => setUser(data))
       .catch((error) => console.error("Error fetching user data:", error));
@@ -153,7 +156,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
   // Učitavanje komentara (bez čekanja na klik)
   useEffect(() => {
-    fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+    fetch(`${BASE_URL}/comment/getcomments/${id}`)
       .then((response) => {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
@@ -177,7 +180,7 @@ const Discussion: React.FC<DiscussionProps> = ({
     if (discussionId && newComment.text.trim() !== "") {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/comment/comment/${discussionId}`,
+          `${BASE_URL}/comment/comment/${discussionId}`,
           {
             method: "POST",
             headers: {
@@ -225,7 +228,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
           try {
             const response = await fetch(
-              `http://localhost:5000/api/comment/deletecomment/${commentId}`,
+              `${BASE_URL}/comment/deletecomment/${commentId}`,
               {
                 method: "DELETE",
                 headers: {
@@ -236,7 +239,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
             if (response.ok) {
               // osveži komentare
-              fetch(`http://localhost:5000/api/comment/getcomments/${id}`)
+              fetch(`${BASE_URL}/comment/getcomments/${id}`)
                 .then((res) => res.json())
                 .then((data) => setComments(data));
             } else {
@@ -253,7 +256,7 @@ const Discussion: React.FC<DiscussionProps> = ({
       
         const token = localStorage.getItem("auth_token"); // Retrieving the token from localStorage
       
-        fetch(`http://localhost:5000/api/discussion/update/${id}`, {
+        fetch(`${BASE_URL}/discussion/update/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -278,7 +281,7 @@ const Discussion: React.FC<DiscussionProps> = ({
 
       const token = localStorage.getItem("auth_token"); 
 
-        fetch(`http://localhost:5000/api/discussion/delete/${id}`, {
+        fetch(`${BASE_URL}/discussion/delete/${id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -452,12 +455,12 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     // Učitavamo sve teme sa servera
-    fetch("http://localhost:5000/api/discussion/themes")
+    fetch(`${BASE_URL}/discussion/themes`)
       .then((response) => response.json())
       .then((data) => setThemes(data)) // Postavljamo teme u state
       .catch((error) => console.error("Error fetching themes:", error));
 
-    fetch("http://localhost:5000/api/discussion/get_all")
+    fetch(`${BASE_URL}/discussion/get_all`)
       .then((response) => response.json())
       .then((data) => setDiscussions(data.discussions))
       .catch((error) => console.error("Error fetching discussions:", error));
@@ -486,7 +489,7 @@ const Home: React.FC = () => {
     e.preventDefault(); // Prevents page refresh
     console.log("Search started with query:", searchQuery);
     if (searchQuery.trim()) {
-      fetch(`http://localhost:5000/api/discussion/search?q=${searchQuery}`)
+      fetch(`${BASE_URL}/discussion/search?q=${searchQuery}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -502,7 +505,7 @@ const Home: React.FC = () => {
         });
     } else {
       console.log("Search query is empty");
-      fetch("http://localhost:5000/api/discussion/get_all")
+      fetch(`${BASE_URL}/discussion/get_all`)
         .then((response) => response.json())
         .then((data) => setDiscussions(data.discussions))
         .catch((error) => console.error("Error fetching discussions:", error));
@@ -549,7 +552,7 @@ const Home: React.FC = () => {
         return;
       }
 
-      fetch("http://localhost:5000/api/discussion/create", {
+      fetch(`${BASE_URL}/discussion/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
