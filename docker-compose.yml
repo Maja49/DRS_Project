@@ -2,17 +2,16 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:8.0
+    image: postgres:15
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 2310
-      MYSQL_DATABASE: drs_clean
-      MYSQL_USER: drs_user
-      MYSQL_PASSWORD: drs_pass
+      POSTGRES_DB: drs_clean
+      POSTGRES_USER: drs_user
+      POSTGRES_PASSWORD: drs_pass
     ports:
-      - "3307:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
 
   backend:
     build: ./backend
@@ -22,10 +21,10 @@ services:
       DB_USER: drs_user
       DB_PASSWORD: drs_pass
       DB_HOST: db
+      DB_PORT: 5432
       DB_NAME: drs_clean
     depends_on:
       - db
-
 
   frontend:
     build: ./frontend
@@ -33,9 +32,8 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules # sprečava konflikte između hosta i kontejnera
+      - /app/node_modules
     command: npm run dev -- --host
-
 
 volumes:
   db_data:

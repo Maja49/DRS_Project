@@ -10,6 +10,7 @@ import time
 from sqlalchemy import text
 import os
 from dotenv import load_dotenv
+import psycopg2
 
 load_dotenv()  # Učitaj .env fajl i postavi varijable okruženja
 
@@ -25,8 +26,9 @@ CORS(app, origins="http://localhost:5173")
 #app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
-    "?sslmode=require"
+    "?sslmode=disable"
 )
+
 
 
 
@@ -65,19 +67,27 @@ app.register_blueprint(user_bp, url_prefix='/api/user')
 
 from sqlalchemy.exc import OperationalError
 
+
+
 def wait_for_db():
-    for i in range(30):  # do 30 pokušaja
+    for i in range(30):
         try:
-            with app.app_context():
-                with db.engine.connect() as conn:
-                    conn.execute(text('SELECT 1'))
-                    conn.commit()  # u nekim slučajevima može biti potrebno
+            conn = psycopg2.connect(
+                dbname=config.DB_NAME,
+                user=config.DB_USER,
+                password=config.DB_PASSWORD,
+                host=config.DB_HOST,
+                port=config.DB_PORT,
+                sslmode="disable"
+            )
+            conn.close()
             print("Database is up!")
             return
-        except OperationalError:
-            print(f"Database not ready, waiting... ({i+1}/30)")
+        except psycopg2.OperationalError as e:
+            print(f"Database not ready, waiting... ({i+1}/30)\n{e}")
             time.sleep(1)
     raise Exception("Could not connect to the database after 30 attempts")
+
 
 
 
