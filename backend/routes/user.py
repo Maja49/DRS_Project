@@ -7,7 +7,7 @@ from utils.email_utils import trigger_email
 user_bp = Blueprint('user', __name__)
 
 # Funkcija za dobavljanje podataka korisnika prema user_id
-@user_bp.route('/get_user/<int:user_id>', methods=['GET'])
+@user_bp.route('/get_user/<int:user_id>', methods=['GET', 'OPTIONS'])
 def get_user(user_id):
     # Pronalaženje korisnika u bazi prema ID-u
     user = User.query.get(user_id)
@@ -33,7 +33,7 @@ def get_user(user_id):
 
 # region azuriranje naloga
 # Ažuriranje korisničkog profila
-@user_bp.route('/update_account', methods=['PUT'])
+@user_bp.route('/update_account', methods=['PUT', 'OPTIONS'])
 def update_account():
     token = request.headers.get('Authorization')
     if not token:
@@ -85,7 +85,7 @@ def update_account():
 # endregion
 
 
-@user_bp.route('/approve_registration', methods=['POST'])
+@user_bp.route('/approve_registration', methods=['POST', 'OPTIONS'])
 def approve_registration():
     data = request.json
     user_id = data.get("user_id")

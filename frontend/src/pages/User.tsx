@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import "./User.css"; // Importovanje CSS datoteke
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+
 const User: React.FC = () => {
   const [userData, setUserData] = useState({
     id: "",
@@ -24,7 +27,7 @@ const User: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/user/get_user/${user_id}`, {
+      const response = await fetch(`${BASE_URL}/user/get_user/${user_id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +81,7 @@ const User: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/user/update_account",
+        `${BASE_URL}/user/update_account`,
         {
           method: "PUT",
           headers: {
