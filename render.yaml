@@ -3,18 +3,33 @@ services:
     name: drs-backend
     env: docker
     plan: free
-    dockerfilePath: backend/Dockerfile.render   # Ovdje je promjena
+    dockerfilePath: backend/Dockerfile.render
     envVars:
       - key: DB_USER
-        value: sql7787897
+        value: drs_postgres_user
       - key: DB_PASSWORD
-        value: SbjFwu2Fa3
+        value: W8cjZ60GxXPhcRFblt4a3ViqgQNo26VD
       - key: DB_HOST
-        value: sql7.freesqldatabase.com
+        value: dpg-d1lttoer433s73e7dp40-a.render-postgres.render.amazonaws.com
       - key: DB_NAME
-        value: sql7787897
+        value: drs_postgres
+      - key: DB_PORT
+        value: '5432'  # Port mora biti string u YAML-u
+      - key: SECRET_KEY
+        value: a#4h!r3d89D09$2faHf!sd83F@#s
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: '587'
+      - key: MAIL_USE_TLS
+        value: 'True'
+      - key: MAIL_USERNAME
+        value: celicdorde@gmail.com
+      - key: MAIL_PASSWORD
+        value: "vppl jsvi kurr fhrt"
+      - key: MAIL_DEFAULT_SENDER
+        value: celicdorde@gmail.com
     autoDeploy: true
-
 
   - type: web
     name: drs-frontend
@@ -23,4 +38,3 @@ services:
     buildCommand: ""
     plan: free
     startCommand: "npm run preview -- --host"
-
