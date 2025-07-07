@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns"; // instalirajte ovo
 import "./Home.css";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || "http://localhost:5000";
 
 
 interface User {

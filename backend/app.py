@@ -11,70 +11,46 @@ from sqlalchemy import text
 import os
 from dotenv import load_dotenv
 import psycopg2
+from sqlalchemy.exc import OperationalError
 
 load_dotenv()  # Učitaj .env fajl i postavi varijable okruženja
-
-
 
 app = Flask(__name__)  # Inicijalizacija Flask aplikacije
 app.config.from_pyfile('config.py')  # Učitaj konfiguraciju koja uključuje MAIL_* postavke
 mail.init_app(app)
 
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": [
+# CORS podešavanje za Render i lokalni rad
+CORS(app, supports_credentials=True, origins=[
     "http://localhost:5173",
     "https://drs-frontend-b2bt.onrender.com"
-]}})
+], resources={r"/api/*": {"origins": "*"}})
 
-
-
-
-@app.route('/')
-def index():
-    return "Backend radi, dobrodošli!"
-
-# Konfiguracija baze
-#app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:3306/{config.DB_NAME}"
+# Konfiguracija baze (PostgreSQL sa SSL podrškom)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"postgresql://{config.DB_USER}:{config.DB_PASSWORD}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}?sslmode={config.DB_SSLMODE}"
 )
-
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = config.SECRET_KEY
 
 print(f"Connecting to DB as: {config.DB_USER}, pass: {config.DB_PASSWORD}, host: {config.DB_HOST}, db: {config.DB_NAME}")
 
-
-
-# inicijalizacija baze, povezuje SQLAlchemy sa flask aplikacijom, inicijalizuje se baza i omogucava aplikaciji da koristi SQLAlchemy za upravljanje podacima
-#db je instanca SQLAlchemy koja omogucava komunikaciu sa bazom
+# Inicijalizacija baze
 db.init_app(app)
 
-# registracija Blueprint-a
-#ovaj blueprint ce se koristiti za login i registraciju, prefiks ce im biti /api/auth
+# Osnovna ruta
+@app.route('/')
+def index():
+    return "Backend radi, dobrodošli!"
+
+# Registracija blueprint-ova
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
-
-
-# ruta za admina koji upravlja registracijama
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
-
-#ruta za temu
 app.register_blueprint(theme_bp, url_prefix='/api/theme')
-
-# Registrovanje discussion Blueprint-a
 app.register_blueprint(discussion_bp, url_prefix='/api/discussion')
+app.register_blueprint(comment_bp, url_prefix='/api/comment')
+app.register_blueprint(user_bp, url_prefix='/api/user')
 
-# Registrovanje comment Blueprint-a
-app.register_blueprint(comment_bp, url_prefix='/api/comment')  
-
-# Registrovanje user Blueprint-a
-app.register_blueprint(user_bp, url_prefix='/api/user')  
-
-
-from sqlalchemy.exc import OperationalError
-
-
-
+# Čekanje baze
 def wait_for_db():
     for i in range(30):
         try:
@@ -84,7 +60,7 @@ def wait_for_db():
                 password=config.DB_PASSWORD,
                 host=config.DB_HOST,
                 port=config.DB_PORT,
-                sslmode="require"
+                sslmode=config.DB_SSLMODE
             )
             conn.close()
             print("Database is up!")
@@ -94,14 +70,10 @@ def wait_for_db():
             time.sleep(1)
     raise Exception("Could not connect to the database after 30 attempts")
 
-
-
-
-
+# Pokretanje aplikacije
 if __name__ == '__main__':
     wait_for_db()  # čekaj da baza bude dostupna prije starta
     with app.app_context():
         db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-

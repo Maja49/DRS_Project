@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"; // Dodaj stilove za tabelu po potrebi
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || "http://localhost:5000";
 
 
 interface User {
