@@ -34,7 +34,7 @@ def admin_required(f):
     return wrapper
 
 # Admin vidi sve zahtjeve za registraciju
-@admin_bp.route('/registration-requests', methods=['GET'])
+@admin_bp.route('/registration-requests', methods=['GET', 'OPTIONS'])
 @admin_required
 def get_registration_requests():
     # Prikaz svih korisnika koji čekaju odobrenje (polje is_approved im je još uvijek false)
@@ -51,7 +51,7 @@ def get_registration_requests():
     } for user in pending_users])
 
 # Prihvatanje korisnikovog zahtjeva za registraciju
-@admin_bp.route('/registration-requests/accept/<int:user_id>', methods=['PUT'])
+@admin_bp.route('/registration-requests/accept/<int:user_id>', methods=['PUT', 'OPTIONS'])
 @admin_required
 def accept_registration_request(user_id):
     user = User.query.get(user_id)
@@ -76,7 +76,7 @@ def accept_registration_request(user_id):
             "error": str(e)
         }), 500
 
-@admin_bp.route('/registration-requests/reject/<int:user_id>', methods=['DELETE'])
+@admin_bp.route('/registration-requests/reject/<int:user_id>', methods=['DELETE', 'OPTIONS'])
 @admin_required
 def reject_registration_request(user_id):
     user = User.query.get(user_id)
@@ -104,7 +104,7 @@ def reject_registration_request(user_id):
 
 # region preuzimanje svih korisnika
 # Ruta za preuzimanje svih korisnika
-@admin_bp.route('/users', methods=['GET'])
+@admin_bp.route('/users', methods=['GET', 'OPTIONS'])
 def get_all_users():
     token = request.headers.get('Authorization')
     if not token:
@@ -142,7 +142,7 @@ def get_all_users():
 # endregion
 
 # Lista svih tema
-@admin_bp.route('/theme-list', methods=['GET'])
+@admin_bp.route('/theme-list', methods=['GET', 'OPTIONS'])
 def list_themes():
     themes = Theme.query.all()
     return jsonify([
@@ -155,7 +155,7 @@ def list_themes():
     ])
     
     # Dodavanje nove teme
-@admin_bp.route('/theme-create', methods=['POST'])
+@admin_bp.route('/theme-create', methods=['POST', 'OPTIONS'])
 def create_theme():
     token = request.headers.get('Authorization')
     if not token:
@@ -194,7 +194,7 @@ def create_theme():
 
 # Brisanje teme
 
-@admin_bp.route('/theme-delete/<int:theme_id>', methods=['DELETE'])
+@admin_bp.route('/theme-delete/<int:theme_id>', methods=['DELETE', 'OPTIONS'])
 def delete_theme(theme_id):
     print("[DEBUG] >>> Funkcija delete_theme je pozvana <<<", flush=True)
     print(f"[DEBUG] DELETE tema pozvana, id = {theme_id}", flush=True)

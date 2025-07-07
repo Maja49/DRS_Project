@@ -6,6 +6,9 @@ import "./Discussion";
 import { DiscussionProps } from "./Discussion";
 import { Discussion } from "./Discussion";
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+
 interface RegistrationRequest {
   id: number;
   name: string;
@@ -113,7 +116,7 @@ const AdminPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/registration-requests",
+        `${BASE_URL}/admin/registration-requests`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -141,7 +144,7 @@ const AdminPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/users",
+        `${BASE_URL}/admin/users`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,7 +168,7 @@ const AdminPage: React.FC = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/registration-requests/accept/${userId}`,
+        `${BASE_URL}/admin/registration-requests/accept/${userId}`,
         {}, // Prazan body
         {
           headers: {
@@ -192,7 +195,7 @@ const AdminPage: React.FC = () => {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/admin/registration-requests/reject/${userId}`,
+        `${BASE_URL}/admin/registration-requests/reject/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -227,10 +230,10 @@ const AdminPage: React.FC = () => {
 
   const handleSearch = (query: string) => {
     const url = query.trim()
-      ? `http://localhost:5000/api/discussion/search?q=${encodeURIComponent(
+      ? `${BASE_URL}/discussion/search?q=${encodeURIComponent(
           query
         )}`
-      : `http://localhost:5000/api/discussion/get_all`;
+      : `${BASE_URL}/discussion/get_all`;
 
     // Fetch zahteva za pretragu
     fetch(url)
@@ -259,7 +262,7 @@ const AdminPage: React.FC = () => {
 
   ////////teme i duskusije///////////
   const fetchDiscussions = () => {
-    fetch("http://localhost:5000/api/discussion/get_all")
+    fetch(`${BASE_URL}/discussion/get_all`)
       .then((response) => response.json())
       .then((data) => setDiscussions(data.discussions))
       .catch((error) => console.error("Error fetching discussions:", error));
@@ -267,7 +270,7 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     // Učitavamo sve teme sa servera
-    fetch("http://localhost:5000/api/discussion/themes")
+    fetch(`${BASE_URL}/discussion/themes`)
       .then((response) => response.json())
       .then((data) => setThemes(data)) // Postavljamo teme u state
       .catch((error) => console.error("Error fetching themes:", error));
@@ -306,7 +309,7 @@ const AdminPage: React.FC = () => {
         return;
       }
 
-      fetch("http://localhost:5000/api/discussion/create", {
+      fetch(`${BASE_URL}/discussion/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -339,7 +342,7 @@ const AdminPage: React.FC = () => {
     try {
       console.log(themeId);
       const response = await axios.delete(
-        `http://localhost:5000/api/admin/theme-delete/${themeId}`, // API endpoint za brisanje teme
+        `${BASE_URL}/admin/theme-delete/${themeId}`, // API endpoint za brisanje teme
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -367,7 +370,7 @@ const AdminPage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/theme-list",
+        `${BASE_URL}/admin/theme-list`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -392,7 +395,7 @@ const AdminPage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admin/theme-create", // URL za dodavanje nove teme
+        `${BASE_URL}/admin/theme-create`, // URL za dodavanje nove teme
         {
           name: name,
           description: description,

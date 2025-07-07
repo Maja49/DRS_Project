@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"; // Dodaj stilove za tabelu po potrebi
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+
 interface User {
   id: number;
   email: string;
@@ -18,7 +21,7 @@ const Admin: React.FC = () => {
     // Fetch za korisnike
     const fetchUsers = async () => {
       try {
-        const response = await fetch("/api/users"); // Backend ruta za dohvat korisnika
+        const response = await fetch(`${BASE_URL}/api/users`); // Backend ruta za dohvat korisnika
         if (!response.ok) {
           throw new Error("Failed to fetch users");
         }
