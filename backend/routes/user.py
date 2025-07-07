@@ -67,6 +67,9 @@ def update_account():
         user.phone_number = data['phone_number']
     if data.get('username'):
         user.username = data['username']
+    if data.get('username'):
+        user.username = data['username']
+
 
     # Čuvanje promena
     try:
