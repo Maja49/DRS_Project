@@ -3,7 +3,6 @@ services:
     name: drs-backend
     env: docker
     plan: free
-    context: backend
     dockerfilePath: backend/Dockerfile
     envVars:
       - key: DB_USER
@@ -21,5 +20,4 @@ services:
     env: docker
     plan: free
     dockerfilePath: frontend/Dockerfile
-    context: frontend
     autoDeploy: true
