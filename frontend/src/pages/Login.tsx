@@ -3,7 +3,8 @@ import { MDBContainer } from "mdb-react-ui-kit";
 import { jwtDecode } from "jwt-decode"; //  import
 import "./Login.css";
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
 
 // Definisanje tipa za dekodirani token
