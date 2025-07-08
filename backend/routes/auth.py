@@ -4,6 +4,7 @@ from models.user import User
 from flask_jwt_extended import create_access_token
 from utils.token_utils import generate_token, decode_token
 from utils.email_utils import trigger_email
+import re
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -25,10 +26,19 @@ def register():
     is_admin = request.json.get('is_admin', False)
     is_approved = request.json.get('is_approved', False)
 
+    if not phone_number or not re.match(r'^\+?\d{7,15}$', phone_number):
+        return jsonify({"message": "Invalid phone number. Format must start with '+' and contain 7 to 15 digits."}), 400
+
+    # Validacija email adrese
+    if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return jsonify({"message": "Invalid email format. Must be in the form name@example.com"}), 400
+
+
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "Username already exists"}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({"message": "Email already exists"}), 400
+    
 
     new_user = User(
         name=name,

@@ -28,11 +28,31 @@ const SignUp: React.FC = () => {
     });
   };
 
+  const isValidPhoneNumber = (phone: string) => {
+    const phoneRegex = /^\+\d{7,15}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    if (!isValidPhoneNumber(formData.phone_number)) {
+      setErrorMessage("Invalid phone number. Format must start with '+' and contain 7 to 15 digits.");
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setErrorMessage("Invalid email format. Must be in the form name@example.com");
       return;
     }
 
