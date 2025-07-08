@@ -61,6 +61,9 @@ def get_all_themes():
 # region create discussion
 @discussion_bp.route('/create', methods=['POST', 'OPTIONS'])
 def create_discussion():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
 
     if not token:
