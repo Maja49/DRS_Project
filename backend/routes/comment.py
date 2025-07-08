@@ -109,7 +109,7 @@ def get_comments_by_discussion(discussion_id):
 
         comment_discussions = CommentDiscussion.query.filter_by(discussion_id=discussion_id).all()
         if not comment_discussions:
-            return jsonify({"message": "No comments found for this discussion"}), 404
+            return jsonify([]), 200
 
         comments = []
         for cd in comment_discussions:
