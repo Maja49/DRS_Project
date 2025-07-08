@@ -225,60 +225,48 @@ def delete_discussion(discussion_id):
 # endregion   
 
 
-# region like_dislike
 @discussion_bp.route('/like_dislike/<int:discussion_id>', methods=['POST', 'OPTIONS'])
 def like_dislike_discussion(discussion_id):
-    # Uzmi token iz Authorization zaglavlja
-    token = request.headers.get('Authorization')
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200  # ✅ OVO je ključno za CORS
 
+    token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Token is missing"}), 403
-    
-    # Uklanjamo 'Bearer ' deo iz tokena i uzimamo samo token
-    token = token.split()[1]
 
-    # Validacija tokena, ekstraktujemo korisnički ID
+    token = token.split()[1]
     decoded = decode_token(token)
     if "error" in decoded:
         return jsonify({"message": decoded["error"]}), 403
 
-    user_id = decoded.get('user_id')  # Dobijamo ID korisnika iz tokena
+    user_id = decoded.get('user_id')
     if not user_id:
         return jsonify({"message": "User ID not found in token"}), 403
 
-    # Preuzimanje podataka iz JSON zahteva
     data = request.get_json()
-    action = data.get('action')  # Može biti "like" ili "dislike"
+    action = data.get('action')
 
-    # Proveri da li je akcija validna
     if action not in ['like', 'dislike']:
         return jsonify({"message": "Invalid action"}), 400
 
-    # Pronađi diskusiju prema ID-u
     discussion = Discussion.query.get(discussion_id)
     if not discussion:
         return jsonify({"message": "Discussion not found"}), 404
 
-    # Proveri da li je korisnik već lajkovao ili dislajkovao ovu diskusiju
     existing_entry = LikeDislike.query.filter_by(user_id=user_id, discussion_id=discussion_id).first()
 
     if existing_entry:
-        # Izmena - da ako klikne opet like/dislike, on se obrise
         if existing_entry.action == action:
             db.session.delete(existing_entry)
         else:
-            # Promeni akciju ako korisnik želi suprotnu
             existing_entry.action = action
     else:
-        # Ako korisnik još nije lajkovao/dislajkovao, napravi novi unos
         new_entry = LikeDislike(user_id=user_id, discussion_id=discussion_id, action=action)
         db.session.add(new_entry)
 
-    # Ažuriraj broj lajkova i dislajkova za ovu diskusiju
     discussion.likes = LikeDislike.query.filter_by(discussion_id=discussion_id, action='like').count()
     discussion.dislikes = LikeDislike.query.filter_by(discussion_id=discussion_id, action='dislike').count()
 
-    # Spremi promene u bazu -izmenjeno 
     try:
         db.session.commit()
         return jsonify({
@@ -288,7 +276,7 @@ def like_dislike_discussion(discussion_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
-# endregion
+
 
 
 # region comment
