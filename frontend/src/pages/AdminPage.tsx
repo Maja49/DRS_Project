@@ -35,6 +35,7 @@ interface Theme {
   description: string;
 }
 
+
 const AdminPage: React.FC = () => {
   const [username, setUsername] = useState<string>("Guest");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -160,57 +161,56 @@ const AdminPage: React.FC = () => {
   };
 
   // Prihvatanje zahtjeva
-  const handleAccept = async (userId: number) => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setErrorMessage("Unauthorized: No token found.");
-      return;
-    }
+const handleAccept = async (userId: number) => {
+  const token = localStorage.getItem("auth_token");
+  if (!token) return;
 
-    try {
-      await axios.put(
-        `${BASE_URL}/admin/registration-requests/accept/${userId}`,
-        {}, // Prazan body
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Pravilno postavljanje header-a
-          },
-        }
-      );
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/admin/registration-requests/accept/${userId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        validateStatus: () => true, // ne baca error nikad
+      }
+    );
 
-      // Uklanjanje zahtjeva iz liste nakon prihvatanja
+    if (response.status === 200 || response.status === 204) {
       setRequests((prev) => prev.filter((req) => req.id !== userId));
-    } catch (error) {
-      console.error("Error accepting request:", error);
-      setErrorMessage("Error accepting request.");
     }
-  };
+    // ne prikazuj ni uspeh ni grešku
+  } catch {
+    // ignorisi sve
+  }
+};
+
 
   // Odbijanje zahtjeva
-  const handleReject = async (userId: number) => {
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setErrorMessage("Unauthorized: No token found.");
-      return;
-    }
+ const handleReject = async (userId: number) => {
+  const token = localStorage.getItem("auth_token");
+  if (!token) return;
 
-    try {
-      await axios.delete(
-        `${BASE_URL}/admin/registration-requests/reject/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  try {
+    const response = await axios.delete(
+      `${BASE_URL}/admin/registration-requests/reject/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        validateStatus: () => true, // ignoriši sve statuse
+      }
+    );
 
-      // Nakon što je zahtev odbijen, filtrirajte listu zahtjeva
+    if (response.status === 200 || response.status === 204) {
       setRequests((prev) => prev.filter((req) => req.id !== userId));
-    } catch (error) {
-      console.error("Error rejecting request:", error);
-      setErrorMessage("Error rejecting request.");
     }
-  };
+    // nema poruka ni ako uspe ni ako ne uspe
+  } catch {
+    // ignorisi sve greske
+  }
+};
 
   useEffect(() => {
     fetchRegistrationRequests();

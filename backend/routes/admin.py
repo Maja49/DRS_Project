@@ -9,6 +9,8 @@ from utils.token_utils import decode_token
 import traceback
 from .email_sender import send_email
 import logging
+from utils.email_utils import trigger_email
+
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -50,7 +52,6 @@ def get_registration_requests():
         'reject_url': f'/api/admin/registration-requests/reject/{user.id}'
     } for user in pending_users])
 
-
 @admin_bp.route('/registration-requests/accept/<int:user_id>', methods=['PUT', 'OPTIONS'])
 @admin_required
 def accept_registration_request(user_id):
@@ -59,23 +60,32 @@ def accept_registration_request(user_id):
 
     user = User.query.get(user_id)
     if not user:
-        return jsonify({"message": "User not found"}), 404
+        return '', 204  # tiho ako ne postoji
 
     user.is_approved = True
     try:
         db.session.commit()
-
-        subject = "Registration Accepted"
-        body = f"Dear {user.name} {user.lastname},\n\nYour registration has been successfully accepted. You can now log in to your account."
-        send_email(subject, [user.email], body)
-
-        return jsonify({"message": "User registration accepted"}), 200
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({
-            "message": "Error accepting registration",
-            "error": str(e)
-        }), 500
+        return '', 500
+
+    try:
+        from utils.email_utils import trigger_email  # isti import kao kod mention
+
+        recipient_email = user.email if user.email else "celicdorde@gmail.com"
+
+        trigger_email(
+            recipient_email,
+            "Novi korisnik prihvaćen",
+            f"Korisnik {user.name} {user.lastname} ({user.username}) je upravo prihvaćen."
+        )
+    except Exception as e:
+        print(f"Greška prilikom slanja mejla: {e}")
+
+
+        return '', 200
+
+
 
 
 @admin_bp.route('/registration-requests/reject/<int:user_id>', methods=['DELETE', 'OPTIONS'])
@@ -86,23 +96,23 @@ def reject_registration_request(user_id):
 
     user = User.query.get(user_id)
     if not user:
-        return jsonify({"message": "User not found"}), 404
+        return '', 204  # tiho ignorisanje
 
     try:
         db.session.delete(user)
         db.session.commit()
+    except:
+        db.session.rollback()
 
+    try:
         subject = "Registration Rejected"
         body = f"Dear {user.name} {user.lastname},\n\nWe regret to inform you that your registration has been rejected."
         send_email(subject, [user.email], body)
+    except:
+        pass  # ni ovo ne prekida
 
-        return jsonify({"message": "User registration rejected and user deleted"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            "message": "Error rejecting registration",
-            "error": str(e)
-        }), 500
+    return '', 200  # prazan odgovor, bez teksta
+
 
 
 @admin_bp.route('/users', methods=['GET', 'OPTIONS'])
