@@ -14,6 +14,7 @@ const User: React.FC = () => {
     city: "",
     country: "",
     phone: "",
+    email: "",
     password: "",
     username: "",
   });
@@ -45,6 +46,7 @@ const User: React.FC = () => {
           city: result.city,
           country: result.country,
           phone: result.phone_number,
+          email: result.email,
           password: result.password, 
           username: result.username,
         });
@@ -53,8 +55,8 @@ const User: React.FC = () => {
         alert(`Greška: ${error.message}`);
       }
     } catch (err) {
-      console.error("Greška prilikom učitavanja korisničkih podataka:", err);
-      alert("Došlo je do greške. Pokušajte ponovo.");
+      console.error("Error loading user data:", err);
+      alert("There has been an error. Try again.");
     }
   };
 
@@ -71,11 +73,29 @@ const User: React.FC = () => {
     }));
   };
 
+  const isValidPhoneNumber = (phone: string) => {
+    const phoneRegex = /^\+?\d{7,15}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   // Funkcija za čuvanje podataka
   const handleSave = async () => {
     const token = localStorage.getItem("auth_token"); 
     if (!token) {
-      alert("Token nije pronađen. Prijavite se ponovo.");
+      if (!isValidPhoneNumber(userData.phone)) {
+      alert("Phone number is invalid. Use format like +381641234567 or 0641234567.");
+      return;
+    }
+    if (!isValidEmail(userData.email)) {
+      alert("Invalid email format. Please enter a valid email address.");
+      return;
+    }
+      alert("Token not found. Try again.");
       return;
     }
 
@@ -89,13 +109,13 @@ const User: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            id: userData.id, // Uključivanje ID korisnika za ažuriranje
             name: userData.firstName,
             lastname: userData.lastName,
             adress: userData.address,
             city: userData.city,
             country: userData.country,
             phone_number: userData.phone,
+            email: userData.email,
             username: userData.username,
             password: userData.password
           }),
@@ -119,53 +139,62 @@ const User: React.FC = () => {
     window.history.back();
   };
 
-  return (
+return (
     <div className="user-container">
       <div className="user-header">
         <h1>Edit Profile</h1>
       </div>
 
-      <Form className="user-form">
-        {Object.keys(userData).map((key) => (
-          <Form.Group className="mb-3" key={key}>
-            <Form.Label>
-              {key === "firstName"
-                ? "First Name"
-                : key === "lastName"
-                ? "Last Name"
-                : key === "address"
-                ? "Address"
-                : key === "city"
-                ? "City"
-                : key === "country"
-                ? "Country"
-                : key === "phone"
-                ? "Phone number"
-                : key === "username"
-                ? "Username"
-                : key}
-            </Form.Label>
-            <Form.Control
-              type={key === "password" ? "password" : "text"}
-              name={key}
-              value={(userData as any)[key]}
-              onChange={handleChange}
-              placeholder={`Unesite ${key}`}
-            />
-          </Form.Group>
-        ))}
+     <Form className="user-form">
+      <div className="row">
+        {Object.keys(userData)
+          .filter((key) => key !== "id")
+          .map((key) => (
+            <div className="col-md-6" key={key}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  {key === "firstName"
+                    ? "First Name"
+                    : key === "lastName"
+                    ? "Last Name"
+                    : key === "address"
+                    ? "Address"
+                    : key === "city"
+                    ? "City"
+                    : key === "country"
+                    ? "Country"
+                    : key === "phone"
+                    ? "Phone number"
+                    : key === "email"
+                    ? "Email address"
+                    : key === "username"
+                    ? "Username"
+                    : key}
+                </Form.Label>
+                <Form.Control
+                  type={key === "password" ? "password" : "text"}
+                  name={key}
+                  value={(userData as any)[key]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${key}`}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Use valid phone number (e.g. +381641234567)
+                </Form.Control.Feedback>
+              </Form.Group>
+            </div>
+          ))}
+      </div>
 
-        <Button variant="primary" onClick={handleSave} className="save-button">
-          Save changes
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <Button variant="outline-secondary" onClick={handleBack}>
+          Cancel
         </Button>
-        <Button
-          variant="outline-primary"
-          onClick={handleBack}
-          className="back-button"
-        >
-          Back
+        <Button variant="primary" onClick={handleSave}>
+          Save Changes
         </Button>
-      </Form>
+      </div>
+    </Form>
     </div>
   );
 };

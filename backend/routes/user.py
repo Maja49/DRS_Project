@@ -3,6 +3,8 @@ from models import db
 from models.user import User
 from utils.token_utils import decode_token
 from utils.email_utils import trigger_email
+import re
+
 
 user_bp = Blueprint('user', __name__)
 
@@ -64,7 +66,18 @@ def update_account():
     if data.get('country'):
         user.country = data['country']
     if data.get('phone_number'):
-        user.phone_number = data['phone_number']
+        phone = data['phone_number']
+        if not re.match(r'^\+?\d{7,15}$', phone):
+            return jsonify({"message": "Invalid phone number format."}), 400
+        user.phone_number = phone
+    if data.get('email'):
+        email = data['email']
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return jsonify({"message": "Invalid email format."}), 400
+        existing_email_user = User.query.filter_by(email=email).first()
+        if existing_email_user and existing_email_user.id != user.id:
+            return jsonify({"message": "Email is already taken"}), 400
+        user.email = email
     if data.get('username'):
         existing_user = User.query.filter_by(username=data['username']).first()
         if existing_user and existing_user.id != user.id:
