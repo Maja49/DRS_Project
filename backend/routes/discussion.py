@@ -129,6 +129,9 @@ def create_discussion():
 # region update discussion 
 @discussion_bp.route('/update/<int:discussion_id>', methods=['PUT', 'OPTIONS'])
 def update_discussion(discussion_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
 
     if not token:
@@ -184,6 +187,9 @@ def update_discussion(discussion_id):
 # region delete discussion
 @discussion_bp.route('/delete/<int:discussion_id>', methods=['DELETE', 'OPTIONS'])
 def delete_discussion(discussion_id):
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
 
     if not token:
@@ -286,6 +292,9 @@ def like_dislike_discussion(discussion_id):
 @discussion_bp.route('/comment/<int:discussion_id>', methods=['POST', 'OPTIONS'])
 def comment_discussion(discussion_id):
     # Provera tokena iz Authorization zaglavlja
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"message": "Authorization token is missing"}), 401
